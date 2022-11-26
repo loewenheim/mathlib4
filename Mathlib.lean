@@ -192,7 +192,7 @@ import Mathlib.Tactic.IrreducibleDef
 import Mathlib.Tactic.LeftRight
 import Mathlib.Tactic.LibrarySearch
 import Mathlib.Tactic.LinearCombination
-import Mathlib.Tactic.MkIffOfInductiveProp
+import Mathlib71ca477041bcd6d7c745fe555dc49735c12944b7.Tactic.MkIffOfInductiveProp
 import Mathlib.Tactic.ModCases
 import Mathlib.Tactic.Nontriviality
 import Mathlib.Tactic.Nontriviality.Core
@@ -242,6 +242,7 @@ import Mathlib.Tactic.Zify.Attr
 import Mathlib.Testing.SlimCheck.Gen
 import Mathlib.Testing.SlimCheck.Sampleable
 import Mathlib.Testing.SlimCheck.Testable
+import Mathlib.Topology.UniformSpace.Basic
 import Mathlib.Util.Export
 import Mathlib.Util.IncludeStr
 import Mathlib.Util.MapsTo
