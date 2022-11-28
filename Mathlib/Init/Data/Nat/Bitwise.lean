@@ -50,10 +50,10 @@ theorem bodd_add (m n : ℕ) : bodd (m + n) = xor (bodd m) (bodd n) := by
   induction' n with n IH
   · simp
     cases bodd m <;> rfl
-    
+
   · simp [add_succ, IH]
     cases bodd m <;> cases bodd n <;> rfl
-    
+
 #align nat.bodd_add Nat.bodd_add
 
 @[simp]
@@ -61,10 +61,10 @@ theorem bodd_mul (m n : ℕ) : bodd (m * n) = (bodd m && bodd n) := by
   induction' n with n IH
   · simp
     cases bodd m <;> rfl
-    
+
   · simp [mul_succ, IH]
     cases bodd m <;> cases bodd n <;> rfl
-    
+
 #align nat.bodd_mul Nat.bodd_mul
 
 theorem mod_two_of_bodd (n : ℕ) : n % 2 = cond (bodd n) 1 0 := by
@@ -103,9 +103,9 @@ theorem bodd_add_div2 : ∀ n, cond (bodd n) 1 0 + 2 * div2 n = n
     refine' Eq.trans _ (congr_arg succ (bodd_add_div2 n))
     cases bodd n <;> simp [cond, not]
     · rw [Nat.add_comm, Nat.zero_add]
-      
+
     · rw [succ_mul, Nat.add_comm 1, Nat.zero_add]
-      
+
 #align nat.bodd_add_div2 Nat.bodd_add_div2
 
 theorem div2_val (n) : div2 n = n / 2 := by
@@ -122,7 +122,7 @@ theorem bit0_val (n : Nat) : bit0 n = 2 * n :=
     n + n = 0 + n + n := by rw [Nat.zero_add]
     _ = n * 2 := rfl
     _ = 2 * n := Nat.mul_comm _ _
-    
+
 #align nat.bit0_val Nat.bit0_val
 
 theorem bit1_val (n : Nat) : bit1 n = 2 * n + 1 :=
@@ -311,11 +311,11 @@ theorem bitwise_bit_aux {f : Bool → Bool → Bool} (h : f false false = ff) :
   intro b n
   rw [binary_rec_eq]
   · cases b <;> try rw [h] <;> induction' fft : f ff tt with <;> simp [cond] <;> rfl
-    
+
   · rw [h, show cond (f ff tt) 0 0 = 0 by cases f ff tt <;> rfl,
         show cond (f tt ff) (bit ff 0) 0 = 0 by cases f tt ff <;> rfl] <;>
       rfl
-    
+
 #align nat.bitwise_bit_aux Nat.bitwise_bit_aux
 
 @[simp]
@@ -352,9 +352,9 @@ theorem bitwise_bit {f : Bool → Bool → Bool} (h : f false false = ff) (a m b
     rw [binary_rec_eq, binary_rec_zero]
     rw [← bitwise_bit_aux h, ftf]
     rfl
-    
+
   · exact bitwise_bit_aux h
-    
+
 #align nat.bitwise_bit Nat.bitwise_bit
 
 theorem bitwise_swap {f : Bool → Bool → Bool} (h : f false false = ff) :
@@ -365,7 +365,7 @@ theorem bitwise_swap {f : Bool → Bool → Bool} (h : f false false = ff) :
   apply binary_rec _ (fun a m' IH => _) m <;> intro n
   · rw [bitwise_zero_left, bitwise_zero_right]
     exact h
-    
+
   apply bit_cases_on n <;> intro b n'
   rw [bitwise_bit, bitwise_bit, IH] <;> exact h
 #align nat.bitwise_swap Nat.bitwise_swap
@@ -397,9 +397,9 @@ theorem test_bit_bitwise {f : Bool → Bool → Bool} (h : f false false = ff) (
     induction' k with k IH <;>
       intro m n <;> apply bit_cases_on m <;> intro a m' <;> apply bit_cases_on n <;> intro b n' <;> rw [bitwise_bit h]
   · simp [test_bit_zero]
-    
+
   · simp [test_bit_succ, IH]
-    
+
 #align nat.test_bit_bitwise Nat.test_bit_bitwise
 
 @[simp]
@@ -423,4 +423,3 @@ theorem test_bit_lxor : ∀ m n k, testBit (lxor m n) k = xor (testBit m k) (tes
 #align nat.test_bit_lxor Nat.test_bit_lxor
 
 end Nat
-
