@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Author: Mario Carneiro
 -/
 prelude
-import Leanbin.Init.Data.Nat.Lemmas
-import Leanbin.Init.Meta.WellFoundedTactics
+import Mathlib.Init.Data.Nat.Lemmas
 
 universe u
 
@@ -14,10 +13,10 @@ namespace Nat
 def boddDiv2 : ℕ → Bool × ℕ
   | 0 => (false, 0)
   | succ n =>
-    match bodd_div2 n with
-    | (ff, m) => (true, m)
-    | (tt, m) => (false, succ m)
-#align nat.bodd_div2 Nat.boddDiv2
+    match boddDiv2 n with
+    | (false, m) => (true, m)
+    | (true, m) => (false, succ m)
+#align nat.boddDiv2 Nat.boddDiv2
 
 def div2 (n : ℕ) : ℕ :=
   (boddDiv2 n).2
@@ -28,15 +27,15 @@ def bodd (n : ℕ) : Bool :=
 #align nat.bodd Nat.bodd
 
 @[simp]
-theorem bodd_zero : bodd 0 = ff :=
+theorem bodd_zero : bodd 0 = false :=
   rfl
 #align nat.bodd_zero Nat.bodd_zero
 
-theorem bodd_one : bodd 1 = tt :=
+theorem bodd_one : bodd 1 = true :=
   rfl
 #align nat.bodd_one Nat.bodd_one
 
-theorem bodd_two : bodd 2 = ff :=
+theorem bodd_two : bodd 2 = false :=
   rfl
 #align nat.bodd_two Nat.bodd_two
 
@@ -91,7 +90,7 @@ theorem div2_two : div2 2 = 1 :=
 
 @[simp]
 theorem div2_succ (n : ℕ) : div2 (succ n) = cond (bodd n) (succ (div2 n)) (div2 n) := by
-  unfold bodd div2 bodd_div2 <;> cases bodd_div2 n <;> cases fst <;> rfl
+  unfold bodd div2 boddDiv2 <;> cases boddDiv2 n <;> cases fst <;> rfl
 #align nat.div2_succ Nat.div2_succ
 
 attribute [local simp] Nat.add_comm Nat.add_assoc Nat.add_left_comm Nat.mul_comm Nat.mul_assoc
