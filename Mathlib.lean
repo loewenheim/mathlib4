@@ -117,6 +117,7 @@ import Mathlib.Init.Data.Fin.Basic
 import Mathlib.Init.Data.Int.Basic
 import Mathlib.Init.Data.Int.Order
 import Mathlib.Init.Data.Nat.Basic
+import Mathlib.Init.Data.Nat.Bitwise
 import Mathlib.Init.Data.Nat.Lemmas
 import Mathlib.Init.Data.Ordering.Basic
 import Mathlib.Init.Data.Prod
