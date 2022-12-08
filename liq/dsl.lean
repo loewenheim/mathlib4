@@ -35,6 +35,12 @@ inductive Term
 inductive Formula
 /- equality operator -/
 | eq (l r : Term)
+/- logical truth -/
+| true
+/- logical conjunction -/
+| and (l r : Term)
+/- existential quantification -/
+| exists (b : Term)
 
 structure Sequent := turnstile ::
 (context : List Symbol)
@@ -116,7 +122,6 @@ def inj (A f : Symbol) : Sequent :=
 ⊢
 ∃
 x0 = 0
-
 
 #reduce exact "V^{i-1}" "d" "V^i" "d"
 
