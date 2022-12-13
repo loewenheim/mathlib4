@@ -5,6 +5,8 @@ Authors: Yaël Dillies
 -/
 import Mathlib.Data.Set.Basic
 
+set_option autoImplicit false --**TODO**: remove after ported
+
 /-!
 # Circular order hierarchy
 
@@ -107,7 +109,7 @@ class CircularPreorder (α : Type _) extends HasBtw α, HasSBtw α where
   btw_refl (a : α) : Btw a a a
   btw_cyclic_left {a b c : α} : Btw a b c → Btw b c a
   SBtw := fun a b c => Btw a b c ∧ ¬Btw c b a
-  sBtw_iff_btw_not_btw {a b c : α} : SBtw a b c ↔ Btw a b c ∧ ¬Btw c b a := by intros; rfl
+  sBtw_iff_btw_not_btw {a b c : α} : SBtw a b c ↔ Btw a b c ∧ ¬Btw c b a := by intros; rfl --check
   sBtw_trans_left {a b c d : α} : SBtw a b c → SBtw b d c → SBtw a d c
 #align circular_preorder CircularPreorder
 
@@ -188,7 +190,7 @@ theorem sBtw_of_btw_not_btw {a b c : α} (habc : Btw a b c) (hcba : ¬Btw c b a)
 alias sBtw_of_btw_not_btw ← HasBtw.Btw.sBtw_of_not_btw
 
 theorem sBtw_cyclic_left {a b c : α} (h : SBtw a b c) : SBtw b c a :=
-  h.Btw.cyclic_left.sBtw_of_not_btw fun h' => h.not_btw h'.cyclic_left
+  h.btw.cyclic_left.sBtw_of_not_btw fun h' => h.not_btw h'.cyclic_left
 #align sbtw_cyclic_left sBtw_cyclic_left
 
 alias sBtw_cyclic_left ← HasSBtw.SBtw.cyclic_left
@@ -218,12 +220,12 @@ theorem sBtw_trans_right {a b c d : α} (hbc : SBtw a b c) (hcd : SBtw a c d) : 
 alias sBtw_trans_right ← HasSBtw.SBtw.trans_right
 
 theorem sBtw_asymm {a b c : α} (h : SBtw a b c) : ¬SBtw c b a :=
-  h.Btw.not_sBtw
+  h.btw.not_sBtw
 #align sbtw_asymm sBtw_asymm
 
 alias sBtw_asymm ← HasSBtw.SBtw.not_sBtw
 
-theorem sBtw_irrefl_left_right {a b : α} : ¬SBtw a b a := fun h => h.not_btw h.Btw
+theorem sBtw_irrefl_left_right {a b : α} : ¬SBtw a b a := fun h => h.not_btw h.btw
 #align sbtw_irrefl_left_right sBtw_irrefl_left_right
 
 theorem sBtw_irrefl_left {a b : α} : ¬SBtw a a b := fun h => sBtw_irrefl_left_right h.cyclic_left
