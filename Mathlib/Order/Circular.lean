@@ -6,8 +6,6 @@ Authors: Yaël Dillies
 import Mathlib.Data.Set.Basic
 import Mathlib.Tactic.Set
 
--- set_option autoImplicit true --**TODO**: remove after ported
-
 /-!
 # Circular order hierarchy
 
@@ -19,7 +17,7 @@ This file defines circular preorders, circular partial orders and circular order
   - reflexive: `Btw a a a`
   - cyclic: `Btw a b c → Btw b c a`
   - antisymmetric: `Btw a b c → Btw c b a → a = b ∨ b = c ∨ c = a`
-  - total: `Btw  a b c ∨ Btw c b a`
+  - total: `Btw a b c ∨ Btw c b a`
   along with a strict betweenness relation `SBtw : α → α → α → Prop` which respects
   `SBtw a b c ↔ Btw a b c ∧ ¬ Btw c b a`, analogously to how `<` and `≤` are related, and is
   - transitive: `SBtw a b c → sbtw b d c → sbtw a d c`.
@@ -102,7 +100,6 @@ class HasSBtw (α : Type _) where
 
 export HasSBtw (SBtw)
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:61:18: unsupported non-interactive tactic order_laws_tac -/
 /-- A circular preorder is the analogue of a preorder where you can loop around. `≤` and `<` are
 replaced by ternary relations `Btw` and `SBtw`. `Btw` is reflexive and cyclic. `SBtw` is transitive.
 -/
@@ -110,7 +107,8 @@ class CircularPreorder (α : Type _) extends HasBtw α, HasSBtw α where
   btw_refl (a : α) : Btw a a a
   btw_cyclic_left {a b c : α} : Btw a b c → Btw b c a
   SBtw := fun a b c => Btw a b c ∧ ¬Btw c b a
-  sBtw_iff_btw_not_btw {a b c : α} : SBtw a b c ↔ Btw a b c ∧ ¬Btw c b a := by intros; rfl --check
+  -- Porting note: `intros; rfl` used in lieu of `order_laws_tac` akin to the port of `PositiveCone`
+  sBtw_iff_btw_not_btw {a b c : α} : SBtw a b c ↔ Btw a b c ∧ ¬Btw c b a := by intros; rfl
   sBtw_trans_left {a b c d : α} : SBtw a b c → SBtw b d c → SBtw a d c
 #align circular_preorder CircularPreorder
 
