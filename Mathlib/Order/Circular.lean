@@ -4,8 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yaël Dillies
 -/
 import Mathlib.Data.Set.Basic
+import Mathlib.Tactic.Set
 
-set_option autoImplicit false --**TODO**: remove after ported
+-- set_option autoImplicit true --**TODO**: remove after ported
 
 /-!
 # Circular order hierarchy
@@ -376,16 +377,15 @@ def LT.toHasSBtw (α : Type _) [LT α] :
 /-- The circular preorder obtained from "looping around" a preorder.
 See note [reducible non-instances]. -/
 @[reducible]
-def Preorder.toCircularPreorder (α : Type _) [Preorder α] :
-    CircularPreorder
-      α where
+def Preorder.toCircularPreorder (α : Type _) [Preorder α] : CircularPreorder α where
   Btw a b c := a ≤ b ∧ b ≤ c ∨ b ≤ c ∧ c ≤ a ∨ c ≤ a ∧ a ≤ b
   SBtw a b c := a < b ∧ b < c ∨ b < c ∧ c < a ∨ c < a ∧ a < b
   btw_refl a := Or.inl ⟨le_rfl, le_rfl⟩
-  btw_cyclic_left a b c h := by
+  btw_cyclic_left h := by
     unfold Btw at h⊢
-    rwa [← or_assoc, or_comm']
-  sBtw_trans_left a b c d := by
+    simp at h⊢
+    rwa [← or_assoc, or_comm]
+  sBtw_trans_left {a} {b} {c} d := by
     rintro (⟨hab, hbc⟩ | ⟨hbc, hca⟩ | ⟨hca, hab⟩) (⟨hbd, hdc⟩ | ⟨hdc, hcb⟩ | ⟨hcb, hbd⟩)
     · exact Or.inl ⟨hab.trans hbd, hdc⟩
     · exact (hbc.not_lt hcb).elim
@@ -396,16 +396,12 @@ def Preorder.toCircularPreorder (α : Type _) [Preorder α] :
     · exact Or.inr (Or.inl ⟨hdc, hca⟩)
     · exact Or.inr (Or.inl ⟨hdc, hca⟩)
     · exact Or.inr (Or.inr ⟨hca, hab.trans hbd⟩)
-  sBtw_iff_btw_not_btw a b c := by
+  sBtw_iff_btw_not_btw {a} {b} {c} := by
     simp_rw [lt_iff_le_not_le]
-    set x₀ := a ≤ b
-    set x₁ := b ≤ c
-    set x₂ := c ≤ a
-    have : x₀ → x₁ → a ≤ c := le_trans
-    have : x₁ → x₂ → b ≤ a := le_trans
-    have : x₂ → x₀ → c ≤ b := le_trans
-    clear_value x₀ x₁ x₂
-    tauto!
+    have := le_trans a b c
+    have := le_trans b c a
+    have := le_trans c a b
+    admit -- Porting note: waiting on `tauto`
 #align preorder.to_circular_preorder Preorder.toCircularPreorder
 
 /-- The circular partial order obtained from "looping around" a partial order.
@@ -413,7 +409,7 @@ See note [reducible non-instances]. -/
 @[reducible]
 def PartialOrder.toCircularPartialOrder (α : Type _) [PartialOrder α] : CircularPartialOrder α :=
   { Preorder.toCircularPreorder α with
-    btw_antisymm := fun a b c => by
+    btw_antisymm := @fun a b c => by
       rintro (⟨hab, hbc⟩ | ⟨hbc, hca⟩ | ⟨hca, hab⟩) (⟨hcb, hba⟩ | ⟨hba, hac⟩ | ⟨hac, hcb⟩)
       · exact Or.inl (hab.antisymm hba)
       · exact Or.inl (hab.antisymm hba)
@@ -446,7 +442,6 @@ def LinearOrder.toCircularOrder (α : Type _) [LinearOrder α] : CircularOrder �
 
 /-! ### Dual constructions -/
 
-
 section OrderDual
 
 instance (α : Type _) [HasBtw α] : HasBtw αᵒᵈ :=
@@ -455,18 +450,18 @@ instance (α : Type _) [HasBtw α] : HasBtw αᵒᵈ :=
 instance (α : Type _) [HasSBtw α] : HasSBtw αᵒᵈ :=
   ⟨fun a b c : α => SBtw c b a⟩
 
-instance (α : Type _) [h : CircularPreorder α] : CircularPreorder αᵒᵈ :=
-  { OrderDual.hasBtw α, OrderDual.hasSBtw α with
-    btw_refl := btw_refl
-    btw_cyclic_left := fun a b c => btw_cyclic_right
-    sBtw_trans_left := fun a b c d habc hbdc => hbdc.trans_right habc
-    sBtw_iff_btw_not_btw := fun a b c => @sBtw_iff_btw_not_btw α _ c b a }
+instance (α : Type _) [CircularPreorder α] : CircularPreorder αᵒᵈ :=
+  { instHasBtwOrderDual α, instHasSBtwOrderDual α with
+    btw_refl := @btw_refl α _
+    btw_cyclic_left := btw_cyclic_right
+    sBtw_trans_left := fun habc hbdc => hbdc.trans_right habc
+    sBtw_iff_btw_not_btw := @fun a b c => @sBtw_iff_btw_not_btw α _ c b a }
 
 instance (α : Type _) [CircularPartialOrder α] : CircularPartialOrder αᵒᵈ :=
-  { OrderDual.circularPreorder α with
-    btw_antisymm := fun a b c habc hcba => @btw_antisymm α _ _ _ _ hcba habc }
+  { instCircularPreorderOrderDual α with
+    btw_antisymm := fun habc hcba => @btw_antisymm α _ _ _ _ hcba habc }
 
 instance (α : Type _) [CircularOrder α] : CircularOrder αᵒᵈ :=
-  { OrderDual.circularPartialOrder α with btw_total := fun a b c => btw_total c b a }
+  { instCircularPartialOrderOrderDual α with btw_total := fun a b c => @btw_total α _ c b a }
 
 end OrderDual
