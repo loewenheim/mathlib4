@@ -594,15 +594,18 @@ section IsDomain
 
 variable [Ring β] [IsDomain β] (abv : β → α) [IsAbsoluteValue abv]
 
-theorem one_not_equiv_zero : ¬const abv 1 ≈ const abv 0 := fun h =>
-  have : ∀ ε > 0, ∃ i, ∀ k, i ≤ k → abv (1 - 0) < ε := h
-  have h1 : abv 1 ≤ 0 :=
-    le_of_not_gt fun h2 : 0 < abv 1 =>
-      (Exists.elim (this _ h2)) fun i hi => lt_irrefl (abv 1) <| by simpa using hi _ le_rfl
-  have h2 : 0 ≤ abv 1 := abv_nonneg abv _
-  have : abv 1 = 0 := le_antisymm h1 h2
-  have : (1 : β) = 0 := (abv_eq_zero abv).mp this
-  absurd this one_ne_zero
+theorem const_inj' {a b} : const abv a ≈ const abv b ↔ a = b := by
+  constructor
+  · rintro (h : ∀ ε > 0, ∃ i, ∀ k, i ≤ k → abv (a - b) < ε)
+    rw [←sub_eq_zero, ←abv_eq_zero abv]
+    refine (abv_nonneg abv _).antisymm' ?_
+    refine le_of_not_gt fun h2 => ?_
+    obtain ⟨i, hi⟩ := h _ h2
+    exact (hi _ le_rfl).false
+  · rintro rfl
+    apply equiv.refl
+
+theorem one_not_equiv_zero : ¬const abv 1 ≈ const abv 0 := mt (const_inj' abv).mp one_ne_zero
 #align cau_seq.one_not_equiv_zero CauSeq.one_not_equiv_zero
 
 end IsDomain
