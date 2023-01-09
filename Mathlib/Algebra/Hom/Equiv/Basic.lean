@@ -5,7 +5,7 @@ Authors: Johannes Hölzl, Callum Sutton, Yury Kudryashov
 Ported by: Winston Yin
 
 ! This file was ported from Lean 3 source module algebra.hom.equiv.basic
-! leanprover-community/mathlib commit 76171581280d5b5d1e2d1f4f37e5420357bdc636
+! leanprover-community/mathlib commit 67f362670ed961bcb80239dc40ca18bcd4289c77
 ! Please do not edit these lines, except to modify the commit id
 ! if you have ported upstream changes.
 -/
@@ -188,13 +188,13 @@ instance [Mul M] [Mul N] : MulEquivClass (M ≃* N) M N where
 
 variable [Mul M] [Mul N] [Mul P] [Mul Q]
 
--- Porting note: `toEquiv_eq_coe` no longer needed in Lean4
+-- Porting note: `to_equiv_eq_coe` no longer needed in Lean4
 #noalign mul_equiv.to_equiv_eq_coe
 #noalign add_equiv.to_equiv_eq_coe
--- Porting note: `toFun_eq_coe` no longer needed in Lean4
+-- Porting note: `to_fun_eq_coe` no longer needed in Lean4
 #noalign mul_equiv.to_fun_eq_coe
 #noalign add_equiv.to_fun_eq_coe
--- Porting note: `coe_toEquiv` no longer needed in Lean4
+-- Porting note: `coe_to_equiv` no longer needed in Lean4
 #noalign mul_equiv.coe_to_equiv
 #noalign add_equiv.coe_to_equiv
 
@@ -250,7 +250,7 @@ def symm {M N : Type _} [Mul M] [Mul N] (h : M ≃* N) : N ≃* M :=
 #align mul_equiv.symm MulEquiv.symm
 #align add_equiv.symm AddEquiv.symm
 
-@[simp, to_additive AddEquiv.invFun_eq_symm]
+@[simp, to_additive]
 theorem invFun_eq_symm {f : M ≃* N} : EquivLike.inv f = f.symm := rfl
 #align mul_equiv.inv_fun_eq_symm MulEquiv.invFun_eq_symm
 #align add_equiv.inv_fun_eq_symm AddEquiv.invFun_eq_symm
@@ -459,10 +459,6 @@ theorem ext {f g : MulEquiv M N} (h : ∀ x, f x = g x) : f = g :=
 #align mul_equiv.ext MulEquiv.ext
 #align add_equiv.ext AddEquiv.ext
 
--- Porting note: can be removed after https://github.com/leanprover-community/mathlib4/pull/954
--- is merged.
-attribute [ext] AddEquiv.ext
-
 @[to_additive]
 theorem ext_iff {f g : MulEquiv M N} : f = g ↔ ∀ x, f x = g x :=
   FunLike.ext_iff
@@ -494,7 +490,7 @@ protected theorem congr_fun {f g : MulEquiv M N} (h : f = g) (x : M) : f x = g x
 #align add_equiv.congr_fun AddEquiv.congr_fun
 
 /-- The `MulEquiv` between two monoids with a unique element. -/
-@[to_additive "The `AddEquiv` between two add_monoids with a unique element."]
+@[to_additive "The `AddEquiv` between two `AddMonoid`s with a unique element."]
 def mulEquivOfUnique {M N} [Unique M] [Unique N] [Mul M] [Mul N] : M ≃* N :=
   { Equiv.equivOfUnique M N with map_mul' := fun _ _ => Subsingleton.elim _ _ }
 #align mul_equiv.mul_equiv_of_unique MulEquiv.mulEquivOfUnique
