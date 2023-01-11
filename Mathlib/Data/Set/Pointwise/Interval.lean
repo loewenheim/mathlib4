@@ -8,11 +8,11 @@ Authors: Yury G. Kudryashov, Patrick Massot
 ! Please do not edit these lines, except to modify the commit id
 ! if you have ported upstream changes.
 -/
-import Mathbin.Data.Set.Intervals.UnorderedInterval
-import Mathbin.Data.Set.Intervals.Monoid
-import Mathbin.Data.Set.Pointwise.Basic
-import Mathbin.Algebra.Order.Field.Basic
-import Mathbin.Algebra.Order.Group.MinMax
+import Mathlib.Data.Set.Intervals.UnorderedInterval
+import Mathlib.Data.Set.Intervals.Monoid
+import Mathlib.Data.Set.Pointwise.Basic
+import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.Algebra.Order.Group.MinMax
 
 /-!
 # (Pre)images of intervals
