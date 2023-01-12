@@ -216,7 +216,7 @@ Both this and `Pgame.recOn` describe Conway induction on games. -/
 @[elab_as_elim]
 def moveRecOn {C : Pgame → Sort _} (x : Pgame)
     (IH : ∀ y : Pgame, (∀ i, C (y.moveLeft i)) → (∀ j, C (y.moveRight j)) → C y) : C x :=
-  x.recOn fun yl yr yL yR => IH (mk yl yr yL yR)
+  sorry --0match x with | mk yl yr yL yR => IH (mk yl yr yL yR)
 #align pgame.move_rec_on Pgame.moveRecOn
 
 /-- `IsOption x y` means that `x` is either a left or right option for `y`. -/
@@ -237,13 +237,15 @@ theorem IsOption.mk_right {xl xr : Type u} (xL : xl → Pgame) (xR : xr → Pgam
 #align pgame.is_option.mk_right Pgame.IsOption.mk_right
 
 -- Porting note: This uses `moveRecOn`
-theorem wf_is_option : WellFounded IsOption :=
+theorem wf_is_option : WellFounded IsOption := sorry
+/-
   ⟨fun x =>
     (moveRecOn x) fun x IHl IHr =>
       (Acc.intro x) fun y h => by
         induction' h with _ i _ j
         · exact IHl i
         · exact IHr j⟩
+-/
 #align pgame.wf_is_option Pgame.wf_is_option
 
 /-- `Subsequent x y` says that `x` can be obtained by playing some nonempty sequence of moves from
@@ -253,15 +255,15 @@ def Subsequent : Pgame → Pgame → Prop :=
 #align pgame.subsequent Pgame.Subsequent
 
 instance : IsTrans _ Subsequent :=
-  TransGen.IsTrans
+  Relation.instIsTransTransGen
 
 @[trans]
 theorem Subsequent.trans {x y z} : Subsequent x y → Subsequent y z → Subsequent x z :=
-  trans_gen.trans
+  TransGen.trans
 #align pgame.subsequent.trans Pgame.Subsequent.trans
 
 theorem wf_subsequent : WellFounded Subsequent :=
-  wf_is_option.TransGen
+  wf_is_option.transGen
 #align pgame.wf_subsequent Pgame.wf_subsequent
 
 instance : WellFoundedRelation Pgame :=
@@ -294,7 +296,7 @@ unsafe def pgame_wf_tac :=
 /-! ### Basic pre-games -/
 
 
-/-- The pre-game `zero` is defined by `0 = { | }`. -/
+/-- The pre-game `Zero` is defined by `0 = { | }`. -/
 instance : Zero Pgame :=
   ⟨⟨PEmpty, PEmpty, PEmpty.elim, PEmpty.elim⟩⟩
 
@@ -309,17 +311,17 @@ theorem zero_right_moves : RightMoves 0 = PEmpty :=
 #align pgame.zero_right_moves Pgame.zero_right_moves
 
 instance is_empty_zero_left_moves : IsEmpty (LeftMoves 0) :=
-  PEmpty.is_empty
+  instIsEmptyPEmpty
 #align pgame.is_empty_zero_left_moves Pgame.is_empty_zero_left_moves
 
 instance is_empty_zero_right_moves : IsEmpty (RightMoves 0) :=
-  PEmpty.is_empty
+  instIsEmptyPEmpty
 #align pgame.is_empty_zero_right_moves Pgame.is_empty_zero_right_moves
 
 instance : Inhabited Pgame :=
   ⟨0⟩
 
-/-- The pre-game `one` is defined by `1 = { 0 | }`. -/
+/-- The pre-game `One` is defined by `1 = { 0 | }`. -/
 instance : One Pgame :=
   ⟨⟨PUnit, PEmpty, fun _ => 0, PEmpty.elim⟩⟩
 
