@@ -216,7 +216,7 @@ Both this and `Pgame.recOn` describe Conway induction on games. -/
 @[elab_as_elim]
 def moveRecOn {C : Pgame → Sort _} (x : Pgame)
     (IH : ∀ y : Pgame, (∀ i, C (y.moveLeft i)) → (∀ j, C (y.moveRight j)) → C y) : C x :=
-  sorry --0match x with | mk yl yr yL yR => IH (mk yl yr yL yR)
+  sorry --match x with | mk yl yr yL yR => IH (mk yl yr yL yR)
 #align pgame.move_rec_on Pgame.moveRecOn
 
 /-- `IsOption x y` means that `x` is either a left or right option for `y`. -/
@@ -287,6 +287,7 @@ theorem Subsequent.mk_right {xl xr} (xL : xl → Pgame) (xR : xr → Pgame) (j :
   @Subsequent.move_right (mk _ _ _ _) j
 #align pgame.subsequent.mk_right Pgame.Subsequent.mk_right
 
+-- Porting note: **TODO**: Port this tactic
 /- ./././Mathport/Syntax/Translate/Expr.lean:333:4: warning: unsupported (TODO): `[tacs] -/
 /-- A local tactic for proving well-foundedness of recursive definitions involving pregames. -/
 unsafe def pgame_wf_tac :=
@@ -345,7 +346,7 @@ instance uniqueOneLeftMoves : Unique (LeftMoves 1) :=
 #align pgame.unique_one_left_moves Pgame.uniqueOneLeftMoves
 
 instance is_empty_one_right_moves : IsEmpty (RightMoves 1) :=
-  PEmpty.is_empty
+  instIsEmptyPEmpty
 #align pgame.is_empty_one_right_moves Pgame.is_empty_one_right_moves
 
 /-! ### Pre-game order relations -/
@@ -366,7 +367,7 @@ def leLf : ∀ x y : Pgame.{u}, Prop × Prop
     ((∀ i, (le_lf (xL i) ⟨yl, yr, yL, yR⟩).2) ∧ ∀ j, (le_lf ⟨xl, xr, xL, xR⟩ (yR j)).2,
       (∃ i, (le_lf ⟨xl, xr, xL, xR⟩ (yL i)).1) ∨
         ∃ j, (le_lf (xR j) ⟨yl, yr, yL, yR⟩).1)decreasing_by
-  pgame_wf_tac
+  pgame_wf_tac -- Porting note: Depends on tactic `pgame_wf_tac`
 #align pgame.le_lf Pgame.leLf
 
 /-- The less or equal relation on pre-games.
