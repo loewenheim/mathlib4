@@ -8,9 +8,9 @@ Authors: Reid Barton, Mario Carneiro, Isabel Longbottom, Scott Morrison
 ! Please do not edit these lines, except to modify the commit id
 ! if you have ported upstream changes.
 -/
-import Mathbin.Data.Fin.Basic
-import Mathbin.Data.List.Basic
-import Mathbin.Logic.Relation
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.List.Basic
+import Mathlib.Logic.Relation
 
 /-!
 # Combinatorial (pre-)games.
