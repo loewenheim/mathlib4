@@ -11,6 +11,8 @@ Authors: Mario Carneiro, Neil Strickland
 
 import Mathlib.Algebra.NeZero
 import Mathlib.Order.Basic
+import Mathlib.Tactic.Coe
+import Mathlib.Tactic.Lift
 
 /-!
 # The positive natural numbers
@@ -33,17 +35,26 @@ notation "ℕ+" => PNat
 instance : One ℕ+ :=
   ⟨⟨1, Nat.zero_lt_one⟩⟩
 
+/-- The underlying natural number -/
+@[coe]
+def PNat.val : ℕ+ → ℕ := Subtype.val
+
 instance coePNatNat : Coe ℕ+ ℕ :=
-  ⟨Subtype.val⟩
+  ⟨PNat.val⟩
 #align coe_pnat_nat coePNatNat
 
 instance : Repr ℕ+ :=
   ⟨fun n n' => reprPrec n.1 n'⟩
 
+--Porting note: New instance not in Lean3
+instance (n : ℕ) : OfNat ℕ+ (n+1) :=
+  ⟨⟨n + 1, Nat.succ_pos n⟩⟩
+
 namespace PNat
 
+-- Note: similar to Subtype.coe_mk
 -- Porting note: no `simp` due to eagerly elaborated coercions
-theorem mk_coe (n h) : ((⟨n, h⟩ : ℕ+) : ℕ) = n :=
+theorem mk_coe (n h) : (PNat.val (⟨n, h⟩ : ℕ+) : ℕ) = n :=
   rfl
 #align pnat.mk_coe PNat.mk_coe
 
@@ -280,20 +291,17 @@ def divExact (m k : ℕ+) : ℕ+ :=
 
 end PNat
 
--- Porting note: `lift` tactic is not implemented yet.
-/-
 section CanLift
 
-instance Nat.canLiftPNat : CanLift ℕ ℕ+ coe ((· < ·) 0) :=
+instance Nat.canLiftPNat : CanLift ℕ ℕ+ (↑) (fun n => 0 < n) :=
   ⟨fun n hn => ⟨Nat.toPNat' n, PNat.toPNat'_coe hn⟩⟩
 #align nat.can_lift_pnat Nat.canLiftPNat
 
-instance Int.canLiftPNat : CanLift ℤ ℕ+ coe ((· < ·) 0) :=
+instance Int.canLiftPNat : CanLift ℤ ℕ+ (↑) ((0 < ·)) :=
   ⟨fun n hn =>
     ⟨Nat.toPNat' (Int.natAbs n), by
-      rw [coe_coe, Nat.toPNat'_coe, if_pos (Int.nat_abs_pos_of_ne_zero hn.ne'),
-        Int.nat_abs_of_nonneg hn.le]⟩⟩
+      rw [Nat.toPNat'_coe, if_pos (Int.natAbs_pos.2 hn.ne'), Int.ofNat_eq_coe,
+        Int.natAbs_of_nonneg hn.le]⟩⟩
 #align int.can_lift_pnat Int.canLiftPNat
 
 end CanLift
--/
