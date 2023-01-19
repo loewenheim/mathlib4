@@ -97,7 +97,7 @@ theorem sups_subset_right : s₁ ⊆ s₂ → s₁ ⊻ t ⊆ s₂ ⊻ t :=
   image₂_subset_right
 #align finset.sups_subset_right Finset.sups_subset_right
 
-theorem image_subsetSups_left : b ∈ t → (fun a => a ⊔ b) '' s ⊆ s ⊻ t :=
+theorem image_subsetSups_left : b ∈ t → (· ⊔ b) '' s ⊆ s ⊻ t :=
   image_subset_image₂_left
 #align finset.image_subset_sups_left Finset.image_subsetSups_left
 
@@ -147,12 +147,12 @@ theorem sups_eq_empty_iff : s ⊻ t = ∅ ↔ s = ∅ ∨ t = ∅ :=
 #align finset.sups_eq_empty_iff Finset.sups_eq_empty_iff
 
 @[simp]
-theorem sups_singleton_left : {a} ⊻ t = t.image fun b => a ⊔ b :=
+theorem sups_singleton_left : {a} ⊻ t = t.image (a ⊔ ·) :=
   image₂_singleton_left
 #align finset.sups_singleton_left Finset.sups_singleton_left
 
 @[simp]
-theorem sups_singleton_right : s ⊻ {b} = s.image fun a => a ⊔ b :=
+theorem sups_singleton_right : s ⊻ {b} = s.image (· ⊔ b) :=
   image₂_singleton_right
 #align finset.sups_singleton_right Finset.sups_singleton_right
 
