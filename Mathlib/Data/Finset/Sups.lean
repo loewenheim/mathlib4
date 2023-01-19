@@ -430,18 +430,18 @@ theorem cardDisjSups_le : (s ○ t).card ≤ s.card * t.card :=
   (card_le_of_subset disjSups_subsetSups).trans <| cardSups_le _ _
 #align finset.card_disj_sups_le Finset.cardDisjSups_le
 
-variable {s s₁ s₂ t t₁ t₂ u}
+variable {s s₁ s₂ t t₁ t₂}
 
 theorem disjSups_subset (hs : s₁ ⊆ s₂) (ht : t₁ ⊆ t₂) : s₁ ○ t₁ ⊆ s₂ ○ t₂ :=
   image_subset_image <| filter_subset_filter _ <| product_subset_product hs ht
 #align finset.disj_sups_subset Finset.disjSups_subset
 
 theorem disjSups_subset_left (ht : t₁ ⊆ t₂) : s ○ t₁ ⊆ s ○ t₂ := by
-  exact disjSups_subset _ _ _ _ Subset.rfl ht
+  exact disjSups_subset Subset.rfl ht
 #align finset.disj_sups_subset_left Finset.disjSups_subset_left
 
 theorem disjSups_subset_right (hs : s₁ ⊆ s₂) : s₁ ○ t ⊆ s₂ ○ t :=
-  disjSups_subset _ _ _ _ hs Subset.rfl
+  disjSups_subset hs Subset.rfl
 #align finset.disj_sups_subset_right Finset.disjSups_subset_right
 
 theorem forallDisjSups_iff {p : α → Prop} :
@@ -455,7 +455,7 @@ theorem forallDisjSups_iff {p : α → Prop} :
 
 @[simp]
 theorem disjSups_subset_iff : s ○ t ⊆ u ↔ ∀ a ∈ s, ∀ b ∈ t, Disjoint a b → a ⊔ b ∈ u :=
-  forallDisjSups_iff _ _
+  forallDisjSups_iff
 #align finset.disj_sups_subset_iff Finset.disjSups_subset_iff
 
 theorem Nonempty.of_disjSups_left : (s ○ t).Nonempty → s.Nonempty :=
