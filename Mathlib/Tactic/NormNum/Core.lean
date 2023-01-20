@@ -244,6 +244,10 @@ def inferRing (α : Q(Type u)) : MetaM Q(Ring $α) :=
 def inferDivisionRing (α : Q(Type u)) : MetaM Q(DivisionRing $α) :=
   return ← synthInstanceQ (q(DivisionRing $α) : Q(Type u)) <|> throwError "not a division ring"
 
+/-- Helper function to synthesize a typed `DivisionRing α` expression, if it exists. -/
+def inferDivisionRing? (α : Q(Type u)) : MetaM (LOption Q(DivisionRing $α)) :=
+  trySynthInstanceQ (q(DivisionRing $α) : Q(Type u))
+
 /-- Helper function to synthesize a typed `OrderedSemiring α` expression. -/
 def inferOrderedSemiring (α : Q(Type u)) : MetaM Q(OrderedSemiring $α) :=
   return ← synthInstanceQ (q(OrderedSemiring $α) : Q(Type u)) <|>
@@ -293,6 +297,16 @@ exists. -/
 def inferCharZeroOfDivisionRing? {α : Q(Type u)}
     (_i : Q(DivisionRing $α) := by with_reducible assumption) : MetaM (LOption Q(CharZero $α)) :=
   trySynthInstanceQ (q(CharZero $α) : Q(Prop))
+
+/-- Helper function to synthesize a typed `OfScientific α` expression. -/
+def inferOfScientific (α : Q(Type u)) : MetaM Q(OfScientific $α) :=
+  return ← synthInstanceQ (q(OfScientific $α) : Q(Type u)) <|>
+    throwError "does not support scientific notation"
+
+/-- Helper function to synthesize a typed `OfScientific α` expression, if it exists. -/
+def inferOfScientific? (α : Q(Type u)) : MetaM (LOption Q(OfScientific $α)) :=
+  trySynthInstanceQ (q(OfScientific $α) : Q(Type u))
+
 /--
 Extract from a `Result` the integer value (as both a term and an expression),
 and the proof that the original expression is equal to this integer.

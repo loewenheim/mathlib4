@@ -85,6 +85,54 @@ theorem isInt_cast {R} [Ring R] (n m : ℤ) :
       return (.isNegNat rα na q(isInt_cast $a (.negOfNat $na) $pa) : Result q(Int.cast $a : $α))
     | _ => failure
 
+--TODO: clean up
+theorem isRat_ofScientific_of_true [DivisionRing α] [CharZero α] : {m e nm ne d k : ℕ} → {n : ℤ} →
+    IsNat m nm → IsNat e ne → nm = Int.mul k n → Nat.mul k (Nat.succ d) = (10 : ℕ) ^ ne → IsRat ((Rat.ofScientific m true e) : α) n (Nat.succ d)
+  | _, e, _, _, d, _, _, ⟨rfl⟩, ⟨rfl⟩, h₁, h₂ => ⟨
+    invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| Nat.succ_ne_zero d,
+    by
+      simp [Rat.ofScientific, Rat.normalize_eq_mkRat, h₁, ←h₂]
+      have := invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| Nat.succ_ne_zero d
+      rw [← mul_right_inj_of_invertible <| (Nat.succ d : α), Rat.mkRat_mul_left, Rat.mkRat_eq]
+      have : Nat.succ d ≠ 0 := by simp
+      norm_cast
+      simp only [mul_invOf_mul_self_cancel']
+      rw [Rat.coe_nat_eq_divInt <| Nat.succ d, Rat.divInt_mul_divInt_cancel, Rat.divInt_one]
+      simp
+      norm_cast
+      have h₃ := h₂.symm ▸ pow_pos (a := 10) (by decide) e
+      exact Nat.pos_iff_ne_zero.1 <| pos_of_mul_pos_left h₃ (by simp)
+    ⟩
+
+--!! Does this belong here?
+instance DivisionRing.instOfScientific [DivisionRing α] [CharZero α] : OfScientific α where
+  ofScientific (m : ℕ) (b : Bool) (d : ℕ) := Rat.ofScientific m b d
+
+/-- The `norm_num` extension which identifies expressions in scientific notation, normalizing them
+to rat casts if the scientific notation is inherited from the one for rationals. -/
+@[norm_num OfScientific.ofScientific _ _ _] def evalOfScientific :
+    NormNumExt where eval {u α} e := do
+  let .app (.app (.app f (m : Q(ℕ))) (b : Q(Bool))) (exp : Q(ℕ)) ← whnfR e | failure
+  let sα ← inferOfScientific α
+  trace[Tactic.norm_num] "{sα}, {q(($sα).ofScientific)}"
+  guard <|← withNewMCtxDepth <| isDefEq f q(OfScientific.ofScientific (α := $α))
+  --!! Why do we check for defeq sometimes and not others? When is matching on q appropriate?
+  if α.isConstOf ``Rat then
+    guard <|← withNewMCtxDepth <| isDefEq sα q(Rat.instOfScientificRat)
+    let rm ← derive (α := (q(ℕ) : Q(Type))) m; let rexp ← derive (α := (q(ℕ) : Q(Type))) exp
+    match rm, b, rexp with
+    -- | .isNat _ nm pm, ~q(true), .isNat _ nexp pexp => failure
+    -- | .isNat _ nm pm, ~q(false), .isNat _ nexp pexp => failure
+    | _, _, _ => failure
+  else if let .some dα ← inferDivisionRing? α then
+    if let .some _i ← inferCharZeroOfDivisionRing? dα then
+      guard <|← withNewMCtxDepth <| isDefEq sα q(DivisionRing.instOfScientific (α := $α))
+      failure
+    else
+      failure
+  else
+    failure
+
 theorem isNat_add {α} [AddMonoidWithOne α] : {a b : α} → {a' b' c : ℕ} →
     IsNat a a' → IsNat b b' → Nat.add a' b' = c → IsNat (a + b) c
   | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, rfl => ⟨(Nat.cast_add _ _).symm⟩

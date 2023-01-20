@@ -251,6 +251,12 @@ theorem divInt_neg_one_one : -1 /. 1 = -1 :=
     rfl
 #align rat.mk_neg_one_one Rat.divInt_neg_one_one
 
+theorem divInt_one (n : ℤ) : n /. 1 = n :=
+  show divInt _ _ = _ by
+    rw [divInt]
+    simp [mkRat, normalize]
+    rfl
+
 #align rat.mul_one Rat.mul_one
 #align rat.one_mul Rat.one_mul
 #align rat.mul_comm Rat.mul_comm
