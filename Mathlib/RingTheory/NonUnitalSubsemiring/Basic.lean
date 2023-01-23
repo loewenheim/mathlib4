@@ -23,8 +23,8 @@ We define bundled non-unital subsemirings and some standard constructions:
 `map`, `comap` and range (`srange`) of a `non_unital_ring_hom` etc.
 -/
 
-
-open BigOperators
+-- porting note: `BigOperators` is open by defaults
+-- open BigOperators
 
 universe u v w
 
@@ -1022,4 +1022,3 @@ def nonUnitalSubsemiringMap (e : R ≃+* S) (s : NonUnitalSubsemiring R) :
 #align ring_equiv.non_unital_subsemiring_map RingEquiv.nonUnitalSubsemiringMap
 
 end RingEquiv
-
