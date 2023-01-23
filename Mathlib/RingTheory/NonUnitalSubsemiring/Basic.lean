@@ -8,12 +8,12 @@ Authors: Jireh Loreaux
 ! Please do not edit these lines, except to modify the commit id
 ! if you have ported upstream changes.
 -/
-import Mathbin.Algebra.Ring.Equiv
-import Mathbin.Algebra.Ring.Prod
-import Mathbin.Data.Set.Finite
-import Mathbin.GroupTheory.Submonoid.Membership
-import Mathbin.GroupTheory.Subsemigroup.Membership
-import Mathbin.GroupTheory.Subsemigroup.Centralizer
+import Mathlib.Algebra.Ring.Equiv
+import Mathlib.Algebra.Ring.Prod
+import Mathlib.Data.Set.Finite
+import Mathlib.GroupTheory.Submonoid.Membership
+import Mathlib.GroupTheory.Subsemigroup.Membership
+import Mathlib.GroupTheory.Subsemigroup.Centralizer
 
 /-!
 # Bundled non-unital subsemirings
