@@ -541,8 +541,8 @@ def warnExt [Inhabited σ] (stx : Syntax) (ext : PersistentEnvExtension α β σ
       ""}itself, use @[to_additive (attr := to_additive, {attrName})]" else ""
 
 /-- Warn the user when the multiplicative declaration has a simple scoped attribute. -/
-def warnAttr [Inhabited β] (stx : Syntax) (attr : SimpleScopedEnvExtension α β) (f : β → Name → Bool)
-  (thisAttr attrName src tgt : Name) : CoreM Unit :=
+def warnAttr [Inhabited β] (stx : Syntax) (attr : SimpleScopedEnvExtension α β)
+  (f : β → Name → Bool) (thisAttr attrName src tgt : Name) : CoreM Unit :=
 warnExt stx attr.ext (f ·.stateStack.head!.state ·) thisAttr attrName src tgt
 
 /-- Warn the user when the multiplicative declaration has a parametric attribute. -/

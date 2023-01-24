@@ -11,7 +11,7 @@ namespace Test
 
 -- [note] use the below options for diagnostics:
 -- set_option trace.to_additive true
-set_option trace.to_additive_detail true
+-- set_option trace.to_additive_detail true
 -- set_option pp.universes true
 -- set_option pp.explicit true
 -- set_option pp.notation false
