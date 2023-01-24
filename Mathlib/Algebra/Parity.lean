@@ -99,7 +99,7 @@ attribute
       "Alias of the forwards direction of\n`even_iff_exists_two_nsmul`."]
   IsSquare.exists_sq
 
-@[to_additive Even.nsmul]
+@[to_additive]
 theorem IsSquare.pow (n : ℕ) : IsSquare a → IsSquare (a ^ n) := by
   rintro ⟨a, rfl⟩
   exact ⟨a ^ n, (Commute.refl _).mul_pow _⟩

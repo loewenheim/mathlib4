@@ -612,35 +612,35 @@ end AddGroup
 section Group
 variable [Group α] (a b : α)
 
-@[simp, to_additive] lemma mulLeft_one : Equiv.mulLeft (1 : α) = 1 := ext one_mul
-@[simp, to_additive] lemma mulRight_one : Equiv.mulRight (1 : α) = 1 := ext mul_one
+@[to_additive (attr := simp)] lemma mulLeft_one : Equiv.mulLeft (1 : α) = 1 := ext one_mul
+@[to_additive (attr := simp)] lemma mulRight_one : Equiv.mulRight (1 : α) = 1 := ext mul_one
 
-@[simp, to_additive] lemma mulLeft_mul :
+@[to_additive (attr := simp)] lemma mulLeft_mul :
   Equiv.mulLeft (a * b) = Equiv.mulLeft a * Equiv.mulLeft b :=
 ext $ mul_assoc _ _
 
-@[simp, to_additive] lemma mulRight_mul :
+@[to_additive (attr := simp)] lemma mulRight_mul :
   Equiv.mulRight (a * b) = Equiv.mulRight b * Equiv.mulRight a :=
 ext $ fun _ ↦ (mul_assoc _ _ _).symm
 
-@[simp, to_additive inv_addLeft]
+@[to_additive (attr := simp) inv_addLeft]
 lemma inv_mulLeft : (Equiv.mulLeft a)⁻¹ = Equiv.mulLeft a⁻¹ := Equiv.coe_inj.1 rfl
-@[simp, to_additive inv_addRight]
+@[to_additive (attr := simp) inv_addRight]
 lemma inv_mulRight : (Equiv.mulRight a)⁻¹ = Equiv.mulRight a⁻¹ := Equiv.coe_inj.1 rfl
 
-@[simp, to_additive pow_addLeft]
+@[to_additive (attr := simp) pow_addLeft]
 lemma pow_mulLeft (n : ℕ) : Equiv.mulLeft a ^ n = Equiv.mulLeft (a ^ n) :=
 by ext; simp [Perm.coe_pow]
 
-@[simp, to_additive pow_addRight]
+@[to_additive (attr := simp) pow_addRight]
 lemma pow_mulRight (n : ℕ) : Equiv.mulRight a ^ n = Equiv.mulRight (a ^ n) :=
 by ext; simp [Perm.coe_pow]
 
-@[simp, to_additive zpow_addLeft]
+@[to_additive (attr := simp) zpow_addLeft]
 lemma zpow_mulLeft (n : ℤ) : Equiv.mulLeft a ^ n = Equiv.mulLeft (a ^ n) :=
 (map_zpow (⟨⟨Equiv.mulLeft, mulLeft_one⟩, mulLeft_mul⟩ : α →* Perm α) _ _).symm
 
-@[simp, to_additive zpow_addRight]
+@[to_additive (attr := simp) zpow_addRight]
 lemma zpow_mulRight : ∀ n : ℤ, Equiv.mulRight a ^ n = Equiv.mulRight (a ^ n)
 | (Int.ofNat n) => by simp
 | (Int.negSucc n) => by simp
