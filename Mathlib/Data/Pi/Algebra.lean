@@ -102,24 +102,22 @@ instance instSMul [∀ i, SMul α <| f i] : SMul α (∀ i : I, f i) :=
 instance instPow [∀ i, Pow (f i) β] : Pow (∀ i, f i) β :=
   ⟨fun x b i => x i ^ b⟩
 
-@[to_additive (attr := simp) (reorder := 5)]
+@[to_additive (attr := simp, to_additive) (reorder := 5)]
 theorem pow_apply [∀ i, Pow (f i) β] (x : ∀ i, f i) (b : β) (i : I) : (x ^ b) i = x i ^ b :=
   rfl
 
-@[to_additive (reorder := 5)]
+@[to_additive (attr := to_additive) (reorder := 5)]
 theorem pow_def [∀ i, Pow (f i) β] (x : ∀ i, f i) (b : β) : x ^ b = fun i => x i ^ b :=
   rfl
 
 -- `to_additive` generates bad output if we take `Pow α β`.
-@[to_additive (attr := simp) (reorder := 5) smul_const]
+@[to_additive (attr := simp, to_additive) (reorder := 5) smul_const]
 theorem const_pow [Pow β α] (b : β) (a : α) : const I b ^ a = const I (b ^ a) :=
   rfl
 
-@[to_additive (reorder := 6)]
+@[to_additive (attr := to_additive) (reorder := 6)]
 theorem pow_comp [Pow γ α] (x : β → γ) (a : α) (y : I → β) : (x ^ a) ∘ y = x ∘ y ^ a :=
   rfl
-
-attribute [to_additive] smul_apply smul_def smul_const smul_comp
 
 /-!
 Porting note: `bit0` and `bit1` are deprecated. This section can be removed entirely
