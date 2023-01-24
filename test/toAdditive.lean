@@ -306,8 +306,8 @@ def checkGuessName (s t : String) : Elab.Command.CommandElabM Unit :=
 
 run_cmd
   checkGuessName "HMul_Eq_LEOne_Conj₂MulLT'" "HAdd_Eq_Nonpos_Conj₂AddLT'"
-  checkGuessName "OneMulSMulInvDivPow"       "ZeroAddVAddNegSubSMul"
-  checkGuessName "ProdFinprodNpowZpow"       "SumFinsumNsmulZsmul"
+  checkGuessName "OneMulSMulInvDivPow"       "ZeroAddVAddNegSubNSMul"
+  checkGuessName "ProdFinprodNPowZPow"       "SumFinsumNSMulZSMul"
 
   -- The current design swaps all instances of `Comm`+`Add` in order to have
   -- `AddCommMonoid` instead of `CommAddMonoid`.
@@ -338,6 +338,7 @@ run_cmd
   checkGuessName "LTHMulHPowLEHDiv" "LTHAddHSMulLEHSub"
   checkGuessName "OneLEHMul" "NonnegHAdd"
   checkGuessName "OneLTHPow" "PosHSMul"
+  checkGuessName "OneLTPow" "PosNSMul"
   checkGuessName "instCoeTCOneHom" "instCoeTCZeroHom"
   checkGuessName "instCoeTOneHom" "instCoeTZeroHom"
   checkGuessName "instCoeOneHom" "instCoeZeroHom"
