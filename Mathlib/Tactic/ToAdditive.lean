@@ -15,6 +15,7 @@ import Std.Data.Option.Basic
 import Std.Tactic.NormCast.Ext -- just to copy the attribute
 import Std.Tactic.Ext.Attr -- just to copy the attribute
 import Std.Tactic.Lint.Simp -- for DiscrTree.elements
+import Std.Tactic.Lint.Frontend -- useful to lint this file
 import Mathlib.Tactic.Relation.Rfl -- just to copy the attribute
 import Mathlib.Tactic.Relation.Symm -- just to copy the attribute
 import Mathlib.Tactic.Relation.Trans -- just to copy the attribute
@@ -109,17 +110,25 @@ namespace ToAdditive
 
 initialize registerTraceClass `to_additive
 initialize registerTraceClass `to_additive_detail
+
+/-- Linter to check that the reorder attribute is not given manually -/
 register_option linter.toAdditiveReorder : Bool := {
   defValue := true
   descr := "Linter to check that the reorder attribute is not given manually." }
+
+/-- Linter, mostly used by `@[to_additive]`, that checks that the source declaration doesn't have
+certain attributes -/
 register_option linter.existingAttributeWarning : Bool := {
   defValue := true
   descr := "Linter, mostly used by `@[to_additive]`, that checks that the source declaration " ++
     "doesn't have certain attributes" }
+
+/-- Linter to check that the reorder attribute is not given manually -/
 register_option linter.toAdditiveGenerateName : Bool := {
   defValue := true
   descr := "Linter used by `@[to_additive]` that checks if `@[to_additive]` automatically " ++
     "generates the user-given name" }
+
 /--
 An attribute that tells `@[to_additive]` that certain arguments of this definition are not
 involved when using `@[to_additive]`.
