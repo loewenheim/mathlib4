@@ -715,7 +715,8 @@ theorem continuous_induced_rng {g : γ → α} {t₂ : TopologicalSpace β} {t�
   simp only [continuous_iff_le_induced, induced_compose]
 #align continuous_induced_rng continuous_induced_rng
 
-theorem continuous_coinduced_rng {t : TopologicalSpace α} : @Continuous _ _ t (coinduced f t) f := by
+theorem continuous_coinduced_rng {t : TopologicalSpace α} :
+    @Continuous _ _ t (coinduced f t) f := by
   rw [continuous_def]
   intro s h
   exact h
@@ -726,15 +727,15 @@ theorem continuous_coinduced_dom {g : β → γ} {t₁ : TopologicalSpace α} {t
   simp only [continuous_iff_coinduced_le, coinduced_compose]
 #align continuous_coinduced_dom continuous_coinduced_dom
 
-theorem continuous_le_dom {t₁ t₂ : TopologicalSpace α} {t₃ : TopologicalSpace β} (h₁ : t₂ ≤ t₁) (h₂ : @Continuous _ _ t₁ t₃ f) :
-    @Continuous _ _ t₂ t₃ f := by
+theorem continuous_le_dom {t₁ t₂ : TopologicalSpace α} {t₃ : TopologicalSpace β} (h₁ : t₂ ≤ t₁)
+    (h₂ : @Continuous _ _ t₁ t₃ f) : @Continuous _ _ t₂ t₃ f := by
   rw [continuous_def] at h₂⊢
   intro s h
   exact h₁ _ (h₂ s h)
 #align continuous_le_dom continuous_le_dom
 
-theorem continuous_le_rng {t₁ : TopologicalSpace α} {t₂ t₃ : TopologicalSpace β} (h₁ : t₂ ≤ t₃) (h₂ : @Continuous _ _ t₁ t₂ f) :
-    @Continuous _ _ t₁ t₃ f := by
+theorem continuous_le_rng {t₁ : TopologicalSpace α} {t₂ t₃ : TopologicalSpace β} (h₁ : t₂ ≤ t₃)
+    (h₂ : @Continuous _ _ t₁ t₂ f) : @Continuous _ _ t₁ t₃ f := by
   rw [continuous_def] at h₂⊢
   intro s h
   exact h₂ s (h₁ s h)
@@ -760,8 +761,9 @@ theorem continuous_supₛ_dom {T : Set (TopologicalSpace α)} {t₂ : Topologica
   simp only [continuous_iff_le_induced, supₛ_le_iff]
 #align continuous_Sup_dom continuous_supₛ_dom
 
-theorem continuous_supₛ_rng {t₁ : TopologicalSpace α} {t₂ : Set (TopologicalSpace β)} {t : TopologicalSpace β} (h₁ : t ∈ t₂)
-    (hf : @Continuous _ _ t₁ t f) : @Continuous _ _ t₁ (supₛ t₂) f :=
+theorem continuous_supₛ_rng {t₁ : TopologicalSpace α} {t₂ : Set (TopologicalSpace β)}
+    {t : TopologicalSpace β} (h₁ : t ∈ t₂) (hf : @Continuous _ _ t₁ t f) :
+    @Continuous _ _ t₁ (supₛ t₂) f :=
   continuous_iff_coinduced_le.2 <| le_supₛ_of_le h₁ <| continuous_iff_coinduced_le.1 hf
 #align continuous_Sup_rng continuous_supₛ_rng
 
@@ -770,8 +772,8 @@ theorem continuous_supᵢ_dom {t₁ : ι → TopologicalSpace α} {t₂ : Topolo
   simp only [continuous_iff_le_induced, supᵢ_le_iff]
 #align continuous_supr_dom continuous_supᵢ_dom
 
-theorem continuous_supᵢ_rng {t₁ : TopologicalSpace α} {t₂ : ι → TopologicalSpace β} {i : ι} (h : @Continuous _ _ t₁ (t₂ i) f) :
-    @Continuous _ _ t₁ (supᵢ t₂) f :=
+theorem continuous_supᵢ_rng {t₁ : TopologicalSpace α} {t₂ : ι → TopologicalSpace β} {i : ι}
+    (h : @Continuous _ _ t₁ (t₂ i) f) : @Continuous _ _ t₁ (supᵢ t₂) f :=
   continuous_supₛ_rng ⟨i, rfl⟩ h
 #align continuous_supr_rng continuous_supᵢ_rng
 
@@ -790,7 +792,8 @@ theorem continuous_inf_dom_right {t₁ t₂ : TopologicalSpace α} {t₃ : Topol
   continuous_le_dom inf_le_right
 #align continuous_inf_dom_right continuous_inf_dom_right
 
-theorem continuous_infₛ_dom {t₁ : Set (TopologicalSpace α)} {t₂ : TopologicalSpace β} {t : TopologicalSpace α} (h₁ : t ∈ t₁) :
+theorem continuous_infₛ_dom {t₁ : Set (TopologicalSpace α)} {t₂ : TopologicalSpace β}
+    {t : TopologicalSpace α} (h₁ : t ∈ t₁) :
     @Continuous _ _ t t₂ f → @Continuous _ _ (infₛ t₁) t₂ f :=
   continuous_le_dom <| infₛ_le h₁
 #align continuous_Inf_dom continuous_infₛ_dom
