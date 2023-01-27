@@ -873,6 +873,7 @@ import Mathlib.Topology.Bornology.Hom
 import Mathlib.Topology.Constructions
 import Mathlib.Topology.LocallyFinite
 import Mathlib.Topology.NhdsSet
+import Mathlib.Topology.Order
 import Mathlib.Util.AtomM
 import Mathlib.Util.Export
 import Mathlib.Util.IncludeStr
