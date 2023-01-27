@@ -83,17 +83,17 @@ infixl:65 " +ᵥ " => HVAdd.hVAdd
 infixl:65 " -ᵥ " => VSub.vsub
 infixr:73 " • " => HSMul.hSMul
 
-attribute [to_additive] Mul Div HMul instHMul HDiv instHDiv HSMul
+attribute [to_additive existing] Mul Div HMul instHMul HDiv instHDiv HSMul
 attribute [to_additive (reorder := 1) SMul] Pow
 attribute [to_additive (reorder := 1)] HPow
-attribute [to_additive (reorder := 1 5) hSMul] HPow.hPow
-attribute [to_additive (reorder := 1 4) smul] Pow.pow
+attribute [to_additive existing (reorder := 1 5) hSMul] HPow.hPow
+attribute [to_additive (reorder := 1 4) existing smul] Pow.pow
 
 @[to_additive (attr := default_instance)]
 instance instHSMul [SMul α β] : HSMul α β β where
   hSMul := SMul.smul
 
-attribute [to_additive (reorder := 1)] instHPow
+attribute [to_additive existing (reorder := 1)] instHPow
 
 universe u
 
@@ -414,7 +414,7 @@ def nsmulRec [Zero M] [Add M] : ℕ → M → M
   | 0, _ => 0
   | n + 1, a => a + nsmulRec n a
 
-attribute [to_additive] npowRec
+attribute [to_additive existing] npowRec
 
 end
 
@@ -527,7 +527,7 @@ class Monoid (M : Type u) extends Semigroup M, MulOneClass M where
 #align monoid.npow_succ' Monoid.npow_succ
 
 -- Bug #660
-attribute [to_additive] Monoid.toMulOneClass
+attribute [to_additive existing] Monoid.toMulOneClass
 
 @[default_instance high] instance Monoid.Pow {M : Type _} [Monoid M] : Pow M ℕ :=
   ⟨fun x n ↦ Monoid.npow n x⟩
@@ -537,7 +537,7 @@ instance AddMonoid.SMul {M : Type _} [AddMonoid M] : SMul ℕ M :=
   ⟨AddMonoid.nsmul⟩
 #align add_monoid.has_smul_nat AddMonoid.SMul
 
-attribute [to_additive SMul] Monoid.Pow
+attribute [to_additive existing SMul] Monoid.Pow
 
 section
 
@@ -575,7 +575,7 @@ class AddCommMonoid (M : Type u) extends AddMonoid M, AddCommSemigroup M
 @[to_additive]
 class CommMonoid (M : Type u) extends Monoid M, CommSemigroup M
 
-attribute [to_additive] CommMonoid.toCommSemigroup
+attribute [to_additive existing] CommMonoid.toCommSemigroup
 
 section LeftCancelMonoid
 
@@ -588,7 +588,7 @@ class AddLeftCancelMonoid (M : Type u) extends AddLeftCancelSemigroup M, AddMono
 @[to_additive]
 class LeftCancelMonoid (M : Type u) extends LeftCancelSemigroup M, Monoid M
 
-attribute [to_additive] LeftCancelMonoid.toMonoid
+attribute [to_additive existing] LeftCancelMonoid.toMonoid
 
 end LeftCancelMonoid
 
@@ -603,7 +603,7 @@ class AddRightCancelMonoid (M : Type u) extends AddRightCancelSemigroup M, AddMo
 @[to_additive]
 class RightCancelMonoid (M : Type u) extends RightCancelSemigroup M, Monoid M
 
-attribute [to_additive] RightCancelMonoid.toMonoid
+attribute [to_additive existing] RightCancelMonoid.toMonoid
 
 end RightCancelMonoid
 
@@ -618,7 +618,7 @@ class AddCancelMonoid (M : Type u) extends AddLeftCancelMonoid M, AddRightCancel
 @[to_additive]
 class CancelMonoid (M : Type u) extends LeftCancelMonoid M, RightCancelMonoid M
 
-attribute [to_additive] CancelMonoid.toRightCancelMonoid
+attribute [to_additive existing] CancelMonoid.toRightCancelMonoid
 
 /-- Commutative version of `AddCancelMonoid`. -/
 class AddCancelCommMonoid (M : Type u) extends AddLeftCancelMonoid M, AddCommMonoid M
@@ -627,7 +627,7 @@ class AddCancelCommMonoid (M : Type u) extends AddLeftCancelMonoid M, AddCommMon
 @[to_additive]
 class CancelCommMonoid (M : Type u) extends LeftCancelMonoid M, CommMonoid M
 
-attribute [to_additive] CancelCommMonoid.toCommMonoid
+attribute [to_additive existing] CancelCommMonoid.toCommMonoid
 
 -- see Note [lower instance priority]
 @[to_additive]
@@ -660,7 +660,7 @@ def zsmulRec {M : Type _} [Zero M] [Add M] [Neg M] : ℤ → M → M
   | Int.ofNat n, a => nsmulRec n a
   | Int.negSucc n, a => -nsmulRec n.succ a
 
-attribute [to_additive] zpowRec
+attribute [to_additive existing] zpowRec
 
 section InvolutiveInv
 
@@ -786,7 +786,7 @@ instance SubNegMonoid.SMulInt {M} [SubNegMonoid M] : SMul ℤ M :=
   ⟨SubNegMonoid.zsmul⟩
 #align sub_neg_monoid.has_smul_int SubNegMonoid.SMulInt
 
-attribute [to_additive SubNegMonoid.SMulInt] DivInvMonoid.Pow
+attribute [to_additive existing SubNegMonoid.SMulInt] DivInvMonoid.Pow
 
 section DivInvMonoid
 
@@ -821,7 +821,7 @@ theorem negSucc_zsmul {G} [SubNegMonoid G] (a : G) (n : ℕ) :
   exact SubNegMonoid.zsmul_neg' n a
 #align zsmul_neg_succ_of_nat negSucc_zsmul
 
-attribute [to_additive (attr := simp) negSucc_zsmul] zpow_negSucc
+attribute [to_additive existing (attr := simp) negSucc_zsmul] zpow_negSucc
 
 /-- Dividing by an element is the same as multiplying by its inverse.
 
@@ -855,7 +855,7 @@ class InvOneClass (G : Type _) extends One G, Inv G where
 class DivInvOneMonoid (G : Type _) extends DivInvMonoid G, InvOneClass G
 
 -- FIXME: `to_additive` is not operating on the second parent. (#660)
-attribute [to_additive] DivInvOneMonoid.toInvOneClass
+attribute [to_additive existing] DivInvOneMonoid.toInvOneClass
 
 variable [InvOneClass G]
 
@@ -884,7 +884,7 @@ class DivisionMonoid (G : Type u) extends DivInvMonoid G, InvolutiveInv G where
   involutivity of inversion. -/
   inv_eq_of_mul (a b : G) : a * b = 1 → a⁻¹ = b
 
-attribute [to_additive] DivisionMonoid.toInvolutiveInv
+attribute [to_additive existing] DivisionMonoid.toInvolutiveInv
 
 section DivisionMonoid
 
@@ -909,7 +909,7 @@ This is the immediate common ancestor of `CommGroup` and `CommGroupWithZero`. -/
 @[to_additive SubtractionCommMonoid]
 class DivisionCommMonoid (G : Type u) extends DivisionMonoid G, CommMonoid G
 
-attribute [to_additive] DivisionCommMonoid.toCommMonoid
+attribute [to_additive existing] DivisionCommMonoid.toCommMonoid
 
 /-- A `Group` is a `Monoid` with an operation `⁻¹` satisfying `a⁻¹ * a = 1`.
 
@@ -998,7 +998,7 @@ class AddCommGroup (G : Type u) extends AddGroup G, AddCommMonoid G
 @[to_additive]
 class CommGroup (G : Type u) extends Group G, CommMonoid G
 
-attribute [to_additive] CommGroup.toCommMonoid
+attribute [to_additive existing] CommGroup.toCommMonoid
 
 @[to_additive]
 theorem CommGroup.toGroup_injective {G : Type u} : Function.Injective (@CommGroup.toGroup G) := by
