@@ -872,6 +872,7 @@ import Mathlib.Topology.Bornology.Constructions
 import Mathlib.Topology.Bornology.Hom
 import Mathlib.Topology.Constructions
 import Mathlib.Topology.LocallyFinite
+import Mathlib.Topology.Maps
 import Mathlib.Topology.NhdsSet
 import Mathlib.Topology.Order
 import Mathlib.Util.AtomM
