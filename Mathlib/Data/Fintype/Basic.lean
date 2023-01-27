@@ -237,7 +237,7 @@ theorem insert_compl_self (x : α) : insert x ({x}ᶜ : Finset α) = univ := by
 #align finset.insert_compl_self Finset.insert_compl_self
 
 @[simp]
-theorem compl_filter (p : α → Bool) [∀ x, Decidable ¬p x] :
+theorem compl_filter (p : α → Prop) [DecidablePred p] [∀ x, Decidable ¬p x] :
     univ.filter pᶜ = univ.filter fun x => ¬p x :=
   ext <| by simp
 #align finset.compl_filter Finset.compl_filter
@@ -322,7 +322,7 @@ theorem univ_filter_mem_range (f : α → β) [Fintype β] [DecidablePred fun y 
   exact univ_filter_exists f
 #align finset.univ_filter_mem_range Finset.univ_filter_mem_range
 
-theorem coe_filter_univ (p : α → Bool) : (univ.filter p : Set α) = { x | p x } :=
+theorem coe_filter_univ (p : α → Prop) [DecidablePred p] : (univ.filter p : Set α) = { x | p x } :=
   by simp
 #align finset.coe_filter_univ Finset.coe_filter_univ
 
@@ -367,18 +367,21 @@ instance decidableEqOneHomFintype [DecidableEq β] [Fintype α] [One α] [One β
     DecidableEq (OneHom α β) := fun a b =>
   decidable_of_iff ((a : α → β) = b) (Injective.eq_iff FunLike.coe_injective)
 #align fintype.decidable_eq_one_hom_fintype Fintype.decidableEqOneHomFintype
+#align fintype.decidable_eq_zero_hom_fintype Fintype.decidableEqZeroHomFintype
 
 @[to_additive]
 instance decidableEqMulHomFintype [DecidableEq β] [Fintype α] [Mul α] [Mul β] :
     DecidableEq (α →ₙ* β) := fun a b =>
   decidable_of_iff ((a : α → β) = b) (Injective.eq_iff FunLike.coe_injective)
 #align fintype.decidable_eq_mul_hom_fintype Fintype.decidableEqMulHomFintype
+#align fintype.decidable_eq_add_hom_fintype Fintype.decidableEqAddHomFintype
 
 @[to_additive]
 instance decidableEqMonoidHomFintype [DecidableEq β] [Fintype α] [MulOneClass α] [MulOneClass β] :
     DecidableEq (α →* β) := fun a b =>
   decidable_of_iff ((a : α → β) = b) (Injective.eq_iff FunLike.coe_injective)
 #align fintype.decidable_eq_monoid_hom_fintype Fintype.decidableEqMonoidHomFintype
+#align fintype.decidable_eq_add_monoid_hom_fintype Fintype.decidableEqAddMonoidHomFintype
 
 instance decidableEqMonoidWithZeroHomFintype [DecidableEq β] [Fintype α] [MulZeroOneClass α]
     [MulZeroOneClass β] : DecidableEq (α →*₀ β) := fun a b =>
@@ -495,14 +498,12 @@ def invOfMemRange : Set.range f → α := fun b =>
 
 theorem left_inv_of_invOfMemRange (b : Set.range f) : f (hf.invOfMemRange b) = b :=
   (Finset.choose_spec (fun a => f a = b) _ _).right
-#align
-  function.injective.left_inv_of_inv_of_mem_range Function.Injective.left_inv_of_invOfMemRange
+#align function.injective.left_inv_of_inv_of_mem_range Function.Injective.left_inv_of_invOfMemRange
 
 @[simp]
 theorem right_inv_of_invOfMemRange (a : α) : hf.invOfMemRange ⟨f a, Set.mem_range_self a⟩ = a :=
   hf (Finset.choose_spec (fun a' => f a' = f a) _ _).right
-#align
-  function.injective.right_inv_of_inv_of_mem_range Function.Injective.right_inv_of_invOfMemRange
+#align function.injective.right_inv_of_inv_of_mem_range Function.Injective.right_inv_of_invOfMemRange
 
 theorem invFun_restrict [Nonempty α] : (Set.range f).restrict (invFun f) = hf.invOfMemRange :=
   by
@@ -536,15 +537,12 @@ def invOfMemRange : α :=
 @[simp]
 theorem left_inv_of_invOfMemRange : f (f.invOfMemRange b) = b :=
   f.injective.left_inv_of_invOfMemRange b
-#align
-  function.embedding.left_inv_of_inv_of_mem_range Function.Embedding.left_inv_of_invOfMemRange
+#align function.embedding.left_inv_of_inv_of_mem_range Function.Embedding.left_inv_of_invOfMemRange
 
 @[simp]
 theorem right_inv_of_invOfMemRange (a : α) : f.invOfMemRange ⟨f a, Set.mem_range_self a⟩ = a :=
   f.injective.right_inv_of_invOfMemRange a
-#align
-  function.embedding.right_inv_of_inv_of_mem_range
-  Function.Embedding.right_inv_of_invOfMemRange
+#align function.embedding.right_inv_of_inv_of_mem_range Function.Embedding.right_inv_of_invOfMemRange
 
 theorem invFun_restrict [Nonempty α] : (Set.range f).restrict (invFun f) = f.invOfMemRange :=
   by
@@ -821,7 +819,7 @@ theorem Finset.toFinset_coe (s : Finset α) [Fintype (s : Set α)] : (s : Set α
   ext fun _ => Set.mem_toFinset
 #align finset.to_finset_coe Finset.toFinset_coe
 
-instance (n : ℕ) : Fintype (Fin n) :=
+instance Fin.fintype (n : ℕ) : Fintype (Fin n) :=
   ⟨⟨List.finRange n, List.nodup_finRange n⟩, List.mem_finRange⟩
 
 theorem Fin.univ_def (n : ℕ) : (univ : Finset (Fin n)) = ⟨List.finRange n, List.nodup_finRange n⟩ :=

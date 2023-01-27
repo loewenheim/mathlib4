@@ -244,10 +244,6 @@ def inferRing (α : Q(Type u)) : MetaM Q(Ring $α) :=
 def inferDivisionRing (α : Q(Type u)) : MetaM Q(DivisionRing $α) :=
   return ← synthInstanceQ (q(DivisionRing $α) : Q(Type u)) <|> throwError "not a division ring"
 
-/-- Helper function to synthesize a typed `DivisionRing α` expression, if it exists. -/
-def inferDivisionRing? (α : Q(Type u)) : MetaM (LOption Q(DivisionRing $α)) :=
-  trySynthInstanceQ (q(DivisionRing $α) : Q(Type u))
-
 /-- Helper function to synthesize a typed `OrderedSemiring α` expression. -/
 def inferOrderedSemiring (α : Q(Type u)) : MetaM Q(OrderedSemiring $α) :=
   return ← synthInstanceQ (q(OrderedSemiring $α) : Q(Type u)) <|>
