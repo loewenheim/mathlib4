@@ -298,10 +298,33 @@ def inferCharZeroOfDivisionRing? {α : Q(Type u)}
     (_i : Q(DivisionRing $α) := by with_reducible assumption) : MetaM (LOption Q(CharZero $α)) :=
   trySynthInstanceQ (q(CharZero $α) : Q(Prop))
 
+--!! TODO: Move to appropriate place
+instance DivisionRing.instOfScientific [DivisionRing α] : OfScientific α where
+  ofScientific (m : ℕ) (b : Bool) (d : ℕ) := Rat.ofScientific m b d
+
+class LawfulOfScientific (α) [i : OfScientific α] [RatCast α] : Prop where
+  ofScientific_eq (m : ℕ) (b : Bool) (d : ℕ) : i.ofScientific m b d = (Rat.ofScientific m b d : α)
+
+instance : LawfulOfScientific Rat where
+  ofScientific_eq _ _ _ := rfl
+
+instance [DivisionRing α] : LawfulOfScientific α  where
+  ofScientific_eq _ _ _ := rfl
+
 /-- Helper function to synthesize a typed `OfScientific α` expression. -/
 def inferOfScientific (α : Q(Type u)) : MetaM Q(OfScientific $α) :=
   return ← synthInstanceQ (q(OfScientific $α) : Q(Type u)) <|>
     throwError "does not support scientific notation"
+
+/-- Helper function to synthesize a typed `RatCast α` expression. -/
+def inferRatCast (α : Q(Type u)) : MetaM Q(RatCast $α) :=
+  return ← synthInstanceQ (q(RatCast $α) : Q(Type u)) <|>
+    throwError "does not support a rat cast"
+
+/-- Helper function to synthesize a typed `LawfulOfScientific α` expression. -/
+def inferLawfulOfScientific {α : Q(Type u)} (_rα : Q(RatCast $α) := by with_reducible assumption) (_sα : Q(OfScientific $α) := by with_reducible assumption) : MetaM Q(LawfulOfScientific $α) :=
+  return ← synthInstanceQ (q(LawfulOfScientific $α) : Q(Prop)) <|>
+    throwError "does not support lawful scientific notation"
 
 /-- Helper function to synthesize a typed `OfScientific α` expression, if it exists. -/
 def inferOfScientific? (α : Q(Type u)) : MetaM (LOption Q(OfScientific $α)) :=

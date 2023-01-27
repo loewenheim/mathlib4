@@ -86,7 +86,25 @@ theorem isInt_cast {R} [Ring R] (n m : ℤ) :
     | _ => failure
 
 --TODO: clean up
-theorem isRat_ofScientific_of_true [DivisionRing α] [CharZero α] : {m e nm ne d k : ℕ} → {n : ℤ} →
+theorem isRat_ofScientific_of_true [DivisionRing α] [CharZero α] [OfScientific α] [LawfulOfScientific α] : {m e nm ne k : ℕ} → {q : ℚ} →
+    IsNat m nm → IsNat e ne → nm = Int.mul k q.num → Nat.mul k q.den = (10 : ℕ) ^ ne → IsRat (OfScientific.ofScientific (α := α) m true e) q.num q.den
+  | _, e, _, _, _, q, ⟨rfl⟩, ⟨rfl⟩, h₁, h₂ =>
+    have := invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| q.den_nz
+    ⟨_,
+    by
+      simp [LawfulOfScientific.ofScientific_eq, Rat.normalize_eq_mkRat, Rat.ofScientific, h₁, ←h₂]
+      rw [← mul_right_inj_of_invertible (q.den : α), Rat.mkRat_mul_left,
+        ← Rat.mk_eq_mkRat q.num q.den q.den_nz q.reduced, DivisionRing.ratCast_mk, ← invOf_eq_inv]
+      have h₃ := h₂.symm ▸ pow_pos (a := 10) (by decide) e
+      exact Nat.pos_iff_ne_zero.1 <| pos_of_mul_pos_left h₃ <| zero_le q.den
+    ⟩
+
+theorem isNat_ofScientific_of_false [dα : DivisionRing α] [i : OfScientific α] [l : LawfulOfScientific α] : {m e nm ne : ℕ} → {n : ℕ} →
+    IsNat m nm → IsNat e ne → n = Nat.mul nm ((10 : ℕ) ^ e) → IsNat (i.ofScientific m false e) n
+  | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h => ⟨by simp [l.ofScientific_eq, Rat.ofScientific, h]; norm_cast⟩
+
+--TODO: clean up
+theorem isRat_ofScientific_of_true' [DivisionRing α] [CharZero α] : {m e nm ne d k : ℕ} → {n : ℤ} →
     IsNat m nm → IsNat e ne → nm = Int.mul k n → Nat.mul k (Nat.succ d) = (10 : ℕ) ^ ne → IsRat ((Rat.ofScientific m true e) : α) n (Nat.succ d)
   | _, e, _, _, d, _, _, ⟨rfl⟩, ⟨rfl⟩, h₁, h₂ => ⟨
     invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| Nat.succ_ne_zero d,
@@ -104,34 +122,42 @@ theorem isRat_ofScientific_of_true [DivisionRing α] [CharZero α] : {m e nm ne 
       exact Nat.pos_iff_ne_zero.1 <| pos_of_mul_pos_left h₃ (by simp)
     ⟩
 
---!! Does this belong here?
-instance DivisionRing.instOfScientific [DivisionRing α] [CharZero α] : OfScientific α where
-  ofScientific (m : ℕ) (b : Bool) (d : ℕ) := Rat.ofScientific m b d
-
 /-- The `norm_num` extension which identifies expressions in scientific notation, normalizing them
 to rat casts if the scientific notation is inherited from the one for rationals. -/
 @[norm_num OfScientific.ofScientific _ _ _] def evalOfScientific :
     NormNumExt where eval {u α} e := do
   let .app (.app (.app f (m : Q(ℕ))) (b : Q(Bool))) (exp : Q(ℕ)) ← whnfR e | failure
   let sα ← inferOfScientific α
-  trace[Tactic.norm_num] "{sα}, {q(($sα).ofScientific)}"
+  let rα ← inferRatCast α
+  let _lsα ← inferLawfulOfScientific rα sα
   guard <|← withNewMCtxDepth <| isDefEq f q(OfScientific.ofScientific (α := $α))
   --!! Why do we check for defeq sometimes and not others? When is matching on q appropriate?
-  if α.isConstOf ``Rat then
-    guard <|← withNewMCtxDepth <| isDefEq sα q(Rat.instOfScientificRat)
-    let rm ← derive (α := (q(ℕ) : Q(Type))) m; let rexp ← derive (α := (q(ℕ) : Q(Type))) exp
-    match rm, b, rexp with
-    -- | .isNat _ nm pm, ~q(true), .isNat _ nexp pexp => failure
-    -- | .isNat _ nm pm, ~q(false), .isNat _ nexp pexp => failure
-    | _, _, _ => failure
-  else if let .some dα ← inferDivisionRing? α then
-    if let .some _i ← inferCharZeroOfDivisionRing? dα then
-      guard <|← withNewMCtxDepth <| isDefEq sα q(DivisionRing.instOfScientific (α := $α))
-      failure
+  match b with
+  | ~q(true)  =>
+    let ⟨nm, pm⟩ ← deriveNat m q(AddCommMonoidWithOne.toAddMonoidWithOne)
+    let ⟨ne, pe⟩ ← deriveNat exp q(AddCommMonoidWithOne.toAddMonoidWithOne)
+    have pm : Q(IsNat $m $nm) := pm
+    have pe : Q(IsNat $exp $ne) := pe
+    let m' := m.natLit!
+    let exp' := exp.natLit!
+    let qs : ℚ := (m' : ℕ) / ((10 ^ exp') : ℕ)
+    let k := ((10 ^ exp') : ℕ) / qs.den
+    have k : Q(ℕ) := mkRawNatLit k
+    have qn : Q(ℤ) := mkRawIntLit qs.num
+    have qd : Q(ℕ) := mkRawNatLit qs.den
+    have q : Q(ℚ) := mkRawRatLit qs
+    have r1 : Q($nm = Int.mul $k ($q).num) := (q(Eq.refl $nm) : Expr)
+    have r2 : Q(Nat.mul $k $qd = (10 : ℕ) ^ $ne) := (q(Eq.refl (Nat.mul $k $qd)) : Expr)
+    if let some dα ← inferDivisionRing? α then
+      if let some _i ← inferCharZeroOfDivisionRing? α then
+        failure
+      else
+        failure
     else
       failure
-  else
-    failure
+  | ~q(false) => failure
+
+#exit
 
 theorem isNat_add {α} [AddMonoidWithOne α] : {a b : α} → {a' b' c : ℕ} →
     IsNat a a' → IsNat b b' → Nat.add a' b' = c → IsNat (a + b) c
