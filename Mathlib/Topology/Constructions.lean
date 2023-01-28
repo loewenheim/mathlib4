@@ -203,7 +203,7 @@ theorem DenseRange.quotient [Setoid α] [TopologicalSpace α] {f : β → α} (h
 #align dense_range.quotient DenseRange.quotient
 
 instance {p : α → Prop} [TopologicalSpace α] [DiscreteTopology α] : DiscreteTopology (Subtype p) :=
-  ⟨bot_unique fun s _ => ⟨(↑) '' s, isOpen_discrete _, Set.preimage_image_eq _ Subtype.coe_injective⟩⟩
+  ⟨bot_unique fun s _ => ⟨(↑) '' s, isOpen_discrete _, preimage_image_eq _ Subtype.coe_injective⟩⟩
 
 instance Sum.discreteTopology [TopologicalSpace α] [TopologicalSpace β] [hα : DiscreteTopology α]
     [hβ : DiscreteTopology β] : DiscreteTopology (Sum α β) :=
@@ -1035,10 +1035,14 @@ theorem Subtype.dense_iff {s : Set α} {t : Set s} : Dense t ↔ s ⊆ closure (
   rfl
 #align subtype.dense_iff Subtype.dense_iff
 
-theorem map_nhds_subtype_coe_eq {a : α} (ha : p a) (h : ∀ᶠ x in 𝓝 a, p x) :
+-- porting note: new lemma
+theorem map_nhds_subtype_val {s : Set α} (a : s) : map ((↑) : s → α) (𝓝 a) = 𝓝[s] ↑a := by
+  rw [inducing_subtype_val.map_nhds_eq, Subtype.range_val]
+
+theorem map_nhds_subtype_coe_eq_nhds {a : α} (ha : p a) (h : ∀ᶠ x in 𝓝 a, p x) :
     map ((↑) : Subtype p → α) (𝓝 ⟨a, ha⟩) = 𝓝 a :=
   map_nhds_induced_of_mem <| by rw [Subtype.range_val]; exact h
-#align map_nhds_subtype_coe_eq map_nhds_subtype_coe_eq
+#align map_nhds_subtype_coe_eq map_nhds_subtype_coe_eq_nhds
 
 theorem nhds_subtype_eq_comap {a : α} {h : p a} : 𝓝 (⟨a, h⟩ : Subtype p) = comap (↑) (𝓝 a) :=
   nhds_induced _ _
@@ -1058,7 +1062,7 @@ theorem continuous_subtype_nhds_cover {ι : Sort _} {f : α → β} {c : ι → 
     let x' : Subtype (c i) := ⟨x, mem_of_mem_nhds c_sets⟩
     calc
       map f (𝓝 x) = map f (map (↑) (𝓝 x')) :=
-        congr_arg (map f) (map_nhds_subtype_coe_eq _ c_sets).symm
+        congr_arg (map f) (map_nhds_subtype_coe_eq_nhds _ c_sets).symm
       _ = map (fun x : Subtype (c i) => f x) (𝓝 x') := rfl
       _ ≤ 𝓝 (f x) := continuous_iff_continuousAt.mp (f_cont i) x'
 #align continuous_subtype_nhds_cover continuous_subtype_nhds_cover
