@@ -444,7 +444,8 @@ theorem eventually_nhdsWithin_of_forall {s : Set α} {a : α} {p : α → Prop} 
 theorem tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within {a : α} {l : Filter β} {s : Set α}
     (f : β → α) (h1 : Tendsto f l (𝓝 a)) (h2 : ∀ᶠ x in l, f x ∈ s) : Tendsto f l (𝓝[s] a) :=
   tendsto_inf.2 ⟨h1, tendsto_principal.2 h2⟩
-#align tendsto_nhds_within_of_tendsto_nhds_of_eventually_within tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within
+#align tendsto_nhds_within_of_tendsto_nhds_of_eventually_within
+  tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within
 
 theorem tendsto_nhdsWithin_iff {a : α} {l : Filter β} {s : Set α} {f : β → α} :
     Tendsto f l (𝓝[s] a) ↔ Tendsto f l (𝓝 a) ∧ ∀ᶠ n in l, f n ∈ s :=
