@@ -10,7 +10,7 @@ Authors: Andrew Yang, Yury G. Kudryashov
 -/
 import Mathlib.Topology.ContinuousOn
 import Mathlib.Data.Setoid.Basic
-import Mathlib.Tactic.Tfae
+-- import Mathlib.Tactic.Tfae
 
 /-!
 # Inseparable points in a topological space
@@ -42,7 +42,7 @@ topological space, separation setoid
 
 open Set Filter Function
 
-open TopologicalSpace Filter
+open Topology Filter
 
 variable {X Y Z α ι : Type _} {π : ι → Type _} [TopologicalSpace X] [TopologicalSpace Y]
   [TopologicalSpace Z] [∀ i, TopologicalSpace (π i)] {x y z : X} {s : Set X} {f : X → Y}
@@ -69,678 +69,31 @@ def Specializes (x y : X) : Prop :=
   𝓝 x ≤ 𝓝 y
 #align specializes Specializes
 
--- mathport name: «expr ⤳ »
+@[inherit_doc]
 infixl:300 " ⤳ " => Specializes
 
-/- failed to parenthesize: parenthesize: uncaught backtrack exception
-[PrettyPrinter.parenthesize.input] (Command.declaration
-     (Command.declModifiers
-      [(Command.docComment
-        "/--"
-        "A collection of equivalent definitions of `x ⤳ y`. The public API is given by `iff` lemmas\nbelow. -/")]
-      []
-      []
-      []
-      []
-      [])
-     (Command.theorem
-      "theorem"
-      (Command.declId `specializes_tFAE [])
-      (Command.declSig
-       [(Term.explicitBinder "(" [`x `y] [":" `X] [] ")")]
-       (Term.typeSpec
-        ":"
-        (Term.app
-         `TFAE
-         [(«term[_]»
-           "["
-           [(Topology.Inseparable.«term_⤳_» `x " ⤳ " `y)
-            ","
-            («term_≤_»
-             (Term.app `pure [`x])
-             "≤"
-             (Term.app (TopologicalSpace.Topology.Basic.nhds "𝓝") [`y]))
-            ","
-            (Term.forall
-             "∀"
-             [`s]
-             [(Term.typeSpec ":" (Term.app `Set [`X]))]
-             ","
-             (Term.arrow
-              (Term.app `IsOpen [`s])
-              "→"
-              (Term.arrow («term_∈_» `y "∈" `s) "→" («term_∈_» `x "∈" `s))))
-            ","
-            (Term.forall
-             "∀"
-             [`s]
-             [(Term.typeSpec ":" (Term.app `Set [`X]))]
-             ","
-             (Term.arrow
-              (Term.app `IsClosed [`s])
-              "→"
-              (Term.arrow («term_∈_» `x "∈" `s) "→" («term_∈_» `y "∈" `s))))
-            ","
-            («term_∈_»
-             `y
-             "∈"
-             (Term.app
-              `closure
-              [(Term.typeAscription "(" («term{_}» "{" [`x] "}") ":" [(Term.app `Set [`X])] ")")]))
-            ","
-            («term_⊆_»
-             (Term.app
-              `closure
-              [(Term.typeAscription "(" («term{_}» "{" [`y] "}") ":" [(Term.app `Set [`X])] ")")])
-             "⊆"
-             (Term.app `closure [(«term{_}» "{" [`x] "}")]))
-            ","
-            (Term.app `ClusterPt [`y (Term.app `pure [`x])])]
-           "]")])))
-      (Command.declValSimple
-       ":="
-       (Term.byTactic
-        "by"
-        (Tactic.tacticSeq
-         (Tactic.tacticSeq1Indented
-          [(Tactic.tfaeHave "tfae_have" [] (num "1") "→" (num "2"))
-           ";"
-           (Tactic.exact "exact" (Term.proj (Term.app `pure_le_nhds [(Term.hole "_")]) "." `trans))
-           []
-           (Tactic.tfaeHave "tfae_have" [] (num "2") "→" (num "3"))
-           ";"
-           (Tactic.exact
-            "exact"
-            (Term.fun
-             "fun"
-             (Term.basicFun
-              [`h `s `hso `hy]
-              []
-              "=>"
-              (Term.app `h [(Term.app (Term.proj `hso "." `mem_nhds) [`hy])]))))
-           []
-           (Tactic.tfaeHave "tfae_have" [] (num "3") "→" (num "4"))
-           ";"
-           (Tactic.exact
-            "exact"
-            (Term.fun
-             "fun"
-             (Term.basicFun
-              [`h `s `hsc `hx]
-              []
-              "=>"
-              (Term.app
-               `of_not_not
-               [(Term.fun
-                 "fun"
-                 (Term.basicFun
-                  [`hy]
-                  []
-                  "=>"
-                  (Term.app
-                   `h
-                   [(Order.Basic.«term_ᶜ» `s "ᶜ")
-                    (Term.proj `hsc "." `is_open_compl)
-                    `hy
-                    `hx])))]))))
-           []
-           (Tactic.tfaeHave "tfae_have" [] (num "4") "→" (num "5"))
-           ";"
-           (Tactic.exact
-            "exact"
-            (Term.fun
-             "fun"
-             (Term.basicFun
-              [`h]
-              []
-              "=>"
-              (Term.app
-               `h
-               [(Term.hole "_")
-                `isClosed_closure
-                («term_<|_» `subset_closure "<|" (Term.app `mem_singleton [(Term.hole "_")]))]))))
-           []
-           (Tactic.tfaeHave "tfae_have" [] (num "6") "↔" (num "5"))
-           ";"
-           (Tactic.exact
-            "exact"
-            (Term.app `is_closed_closure.closure_subset_iff.trans [`singleton_subset_iff]))
-           []
-           (Tactic.tfaeHave "tfae_have" [] (num "5") "↔" (num "7"))
-           ";"
-           (tactic__
-            (cdotTk (patternIgnore (token.«· » "·")))
-            [(Tactic.rwSeq
-              "rw"
-              []
-              (Tactic.rwRuleSeq
-               "["
-               [(Tactic.rwRule [] `mem_closure_iff_clusterPt)
-                ","
-                (Tactic.rwRule [] `principal_singleton)]
-               "]")
-              [])])
-           []
-           (Tactic.tfaeHave "tfae_have" [] (num "5") "→" (num "1"))
-           []
-           (tactic__
-            (cdotTk (patternIgnore (token.«· » "·")))
-            [(Tactic.refine'
-              "refine'"
-              (Term.fun
-               "fun"
-               (Term.basicFun
-                [`h]
-                []
-                "=>"
-                (Term.app
-                 (Term.proj
-                  (Term.proj (Term.app `nhds_basis_opens [(Term.hole "_")]) "." `ge_iff)
-                  "."
-                  (fieldIdx "2"))
-                 [(Term.hole "_")]))))
-             []
-             (Std.Tactic.rintro
-              "rintro"
-              [(Std.Tactic.RCases.rintroPat.one (Std.Tactic.RCases.rcasesPat.one `s))
-               (Std.Tactic.RCases.rintroPat.one
-                (Std.Tactic.RCases.rcasesPat.tuple
-                 "⟨"
-                 [(Std.Tactic.RCases.rcasesPatLo
-                   (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `hy)])
-                   [])
-                  ","
-                  (Std.Tactic.RCases.rcasesPatLo
-                   (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `ho)])
-                   [])]
-                 "⟩"))]
-              [])
-             []
-             (Std.Tactic.rcases
-              "rcases"
-              [(Tactic.casesTarget
-                []
-                (Term.app (Term.proj `mem_closure_iff "." (fieldIdx "1")) [`h `s `ho `hy]))]
-              ["with"
-               (Std.Tactic.RCases.rcasesPatLo
-                (Std.Tactic.RCases.rcasesPatMed
-                 [(Std.Tactic.RCases.rcasesPat.tuple
-                   "⟨"
-                   [(Std.Tactic.RCases.rcasesPatLo
-                     (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `z)])
-                     [])
-                    ","
-                    (Std.Tactic.RCases.rcasesPatLo
-                     (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `hxs)])
-                     [])
-                    ","
-                    (Std.Tactic.RCases.rcasesPatLo
-                     (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `rfl)])
-                     [":" («term_=_» `z "=" `x)])]
-                   "⟩")])
-                [])])
-             []
-             (Tactic.exact "exact" (Term.app `ho.mem_nhds [`hxs]))])
-           []
-           (Tactic.tfaeFinish "tfae_finish")])))
-       [])
-      []
-      []))
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.abbrev'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.def'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Term.byTactic
-       "by"
-       (Tactic.tacticSeq
-        (Tactic.tacticSeq1Indented
-         [(Tactic.tfaeHave "tfae_have" [] (num "1") "→" (num "2"))
-          ";"
-          (Tactic.exact "exact" (Term.proj (Term.app `pure_le_nhds [(Term.hole "_")]) "." `trans))
-          []
-          (Tactic.tfaeHave "tfae_have" [] (num "2") "→" (num "3"))
-          ";"
-          (Tactic.exact
-           "exact"
-           (Term.fun
-            "fun"
-            (Term.basicFun
-             [`h `s `hso `hy]
-             []
-             "=>"
-             (Term.app `h [(Term.app (Term.proj `hso "." `mem_nhds) [`hy])]))))
-          []
-          (Tactic.tfaeHave "tfae_have" [] (num "3") "→" (num "4"))
-          ";"
-          (Tactic.exact
-           "exact"
-           (Term.fun
-            "fun"
-            (Term.basicFun
-             [`h `s `hsc `hx]
-             []
-             "=>"
-             (Term.app
-              `of_not_not
-              [(Term.fun
-                "fun"
-                (Term.basicFun
-                 [`hy]
-                 []
-                 "=>"
-                 (Term.app
-                  `h
-                  [(Order.Basic.«term_ᶜ» `s "ᶜ")
-                   (Term.proj `hsc "." `is_open_compl)
-                   `hy
-                   `hx])))]))))
-          []
-          (Tactic.tfaeHave "tfae_have" [] (num "4") "→" (num "5"))
-          ";"
-          (Tactic.exact
-           "exact"
-           (Term.fun
-            "fun"
-            (Term.basicFun
-             [`h]
-             []
-             "=>"
-             (Term.app
-              `h
-              [(Term.hole "_")
-               `isClosed_closure
-               («term_<|_» `subset_closure "<|" (Term.app `mem_singleton [(Term.hole "_")]))]))))
-          []
-          (Tactic.tfaeHave "tfae_have" [] (num "6") "↔" (num "5"))
-          ";"
-          (Tactic.exact
-           "exact"
-           (Term.app `is_closed_closure.closure_subset_iff.trans [`singleton_subset_iff]))
-          []
-          (Tactic.tfaeHave "tfae_have" [] (num "5") "↔" (num "7"))
-          ";"
-          (tactic__
-           (cdotTk (patternIgnore (token.«· » "·")))
-           [(Tactic.rwSeq
-             "rw"
-             []
-             (Tactic.rwRuleSeq
-              "["
-              [(Tactic.rwRule [] `mem_closure_iff_clusterPt)
-               ","
-               (Tactic.rwRule [] `principal_singleton)]
-              "]")
-             [])])
-          []
-          (Tactic.tfaeHave "tfae_have" [] (num "5") "→" (num "1"))
-          []
-          (tactic__
-           (cdotTk (patternIgnore (token.«· » "·")))
-           [(Tactic.refine'
-             "refine'"
-             (Term.fun
-              "fun"
-              (Term.basicFun
-               [`h]
-               []
-               "=>"
-               (Term.app
-                (Term.proj
-                 (Term.proj (Term.app `nhds_basis_opens [(Term.hole "_")]) "." `ge_iff)
-                 "."
-                 (fieldIdx "2"))
-                [(Term.hole "_")]))))
-            []
-            (Std.Tactic.rintro
-             "rintro"
-             [(Std.Tactic.RCases.rintroPat.one (Std.Tactic.RCases.rcasesPat.one `s))
-              (Std.Tactic.RCases.rintroPat.one
-               (Std.Tactic.RCases.rcasesPat.tuple
-                "⟨"
-                [(Std.Tactic.RCases.rcasesPatLo
-                  (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `hy)])
-                  [])
-                 ","
-                 (Std.Tactic.RCases.rcasesPatLo
-                  (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `ho)])
-                  [])]
-                "⟩"))]
-             [])
-            []
-            (Std.Tactic.rcases
-             "rcases"
-             [(Tactic.casesTarget
-               []
-               (Term.app (Term.proj `mem_closure_iff "." (fieldIdx "1")) [`h `s `ho `hy]))]
-             ["with"
-              (Std.Tactic.RCases.rcasesPatLo
-               (Std.Tactic.RCases.rcasesPatMed
-                [(Std.Tactic.RCases.rcasesPat.tuple
-                  "⟨"
-                  [(Std.Tactic.RCases.rcasesPatLo
-                    (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `z)])
-                    [])
-                   ","
-                   (Std.Tactic.RCases.rcasesPatLo
-                    (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `hxs)])
-                    [])
-                   ","
-                   (Std.Tactic.RCases.rcasesPatLo
-                    (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `rfl)])
-                    [":" («term_=_» `z "=" `x)])]
-                  "⟩")])
-               [])])
-            []
-            (Tactic.exact "exact" (Term.app `ho.mem_nhds [`hxs]))])
-          []
-          (Tactic.tfaeFinish "tfae_finish")])))
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Tactic.tacticSeq1Indented', expected 'Lean.Parser.Tactic.tacticSeqBracketed'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Tactic.tfaeFinish "tfae_finish")
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1024
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (tactic__
-       (cdotTk (patternIgnore (token.«· » "·")))
-       [(Tactic.refine'
-         "refine'"
-         (Term.fun
-          "fun"
-          (Term.basicFun
-           [`h]
-           []
-           "=>"
-           (Term.app
-            (Term.proj
-             (Term.proj (Term.app `nhds_basis_opens [(Term.hole "_")]) "." `ge_iff)
-             "."
-             (fieldIdx "2"))
-            [(Term.hole "_")]))))
-        []
-        (Std.Tactic.rintro
-         "rintro"
-         [(Std.Tactic.RCases.rintroPat.one (Std.Tactic.RCases.rcasesPat.one `s))
-          (Std.Tactic.RCases.rintroPat.one
-           (Std.Tactic.RCases.rcasesPat.tuple
-            "⟨"
-            [(Std.Tactic.RCases.rcasesPatLo
-              (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `hy)])
-              [])
-             ","
-             (Std.Tactic.RCases.rcasesPatLo
-              (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `ho)])
-              [])]
-            "⟩"))]
-         [])
-        []
-        (Std.Tactic.rcases
-         "rcases"
-         [(Tactic.casesTarget
-           []
-           (Term.app (Term.proj `mem_closure_iff "." (fieldIdx "1")) [`h `s `ho `hy]))]
-         ["with"
-          (Std.Tactic.RCases.rcasesPatLo
-           (Std.Tactic.RCases.rcasesPatMed
-            [(Std.Tactic.RCases.rcasesPat.tuple
-              "⟨"
-              [(Std.Tactic.RCases.rcasesPatLo
-                (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `z)])
-                [])
-               ","
-               (Std.Tactic.RCases.rcasesPatLo
-                (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `hxs)])
-                [])
-               ","
-               (Std.Tactic.RCases.rcasesPatLo
-                (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `rfl)])
-                [":" («term_=_» `z "=" `x)])]
-              "⟩")])
-           [])])
-        []
-        (Tactic.exact "exact" (Term.app `ho.mem_nhds [`hxs]))])
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Tactic.exact "exact" (Term.app `ho.mem_nhds [`hxs]))
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Term.app `ho.mem_nhds [`hxs])
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.namedArgument'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.ellipsis'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      `hxs
-[PrettyPrinter.parenthesize] ...precedences are 1023 >? 1024, (none,
-     [anonymous]) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1022, term))
-      `ho.mem_nhds
-[PrettyPrinter.parenthesize] ...precedences are 1024 >? 1024, (none,
-     [anonymous]) <=? (some 1022, term)
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022, (some 1023, term) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Std.Tactic.rcases
-       "rcases"
-       [(Tactic.casesTarget
-         []
-         (Term.app (Term.proj `mem_closure_iff "." (fieldIdx "1")) [`h `s `ho `hy]))]
-       ["with"
-        (Std.Tactic.RCases.rcasesPatLo
-         (Std.Tactic.RCases.rcasesPatMed
-          [(Std.Tactic.RCases.rcasesPat.tuple
-            "⟨"
-            [(Std.Tactic.RCases.rcasesPatLo
-              (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `z)])
-              [])
-             ","
-             (Std.Tactic.RCases.rcasesPatLo
-              (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `hxs)])
-              [])
-             ","
-             (Std.Tactic.RCases.rcasesPatLo
-              (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `rfl)])
-              [":" («term_=_» `z "=" `x)])]
-            "⟩")])
-         [])])
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      («term_=_» `z "=" `x)
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      `x
-[PrettyPrinter.parenthesize] ...precedences are 51 >? 1024, (none,
-     [anonymous]) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 50, term))
-      `z
-[PrettyPrinter.parenthesize] ...precedences are 51 >? 1024, (none, [anonymous]) <=? (some 50, term)
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 50, (some 51, term) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Term.app (Term.proj `mem_closure_iff "." (fieldIdx "1")) [`h `s `ho `hy])
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.namedArgument'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.ellipsis'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      `hy
-[PrettyPrinter.parenthesize] ...precedences are 1023 >? 1024, (none,
-     [anonymous]) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.namedArgument'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.ellipsis'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1024, term))
-      `ho
-[PrettyPrinter.parenthesize] ...precedences are 1023 >? 1024, (none,
-     [anonymous]) <=? (some 1024, term)
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.namedArgument'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.ellipsis'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1024, term))
-      `s
-[PrettyPrinter.parenthesize] ...precedences are 1023 >? 1024, (none,
-     [anonymous]) <=? (some 1024, term)
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.namedArgument'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.ellipsis'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1024, term))
-      `h
-[PrettyPrinter.parenthesize] ...precedences are 1023 >? 1024, (none,
-     [anonymous]) <=? (some 1024, term)
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1022, term))
-      (Term.proj `mem_closure_iff "." (fieldIdx "1"))
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1024, term))
-      `mem_closure_iff
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1024, (none, [anonymous]) <=? (some 1024, term)
-[PrettyPrinter.parenthesize] ...precedences are 1024 >? 1024, (none,
-     [anonymous]) <=? (some 1022, term)
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022, (some 1023, term) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Std.Tactic.rintro
-       "rintro"
-       [(Std.Tactic.RCases.rintroPat.one (Std.Tactic.RCases.rcasesPat.one `s))
-        (Std.Tactic.RCases.rintroPat.one
-         (Std.Tactic.RCases.rcasesPat.tuple
-          "⟨"
-          [(Std.Tactic.RCases.rcasesPatLo
-            (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `hy)])
-            [])
-           ","
-           (Std.Tactic.RCases.rcasesPatLo
-            (Std.Tactic.RCases.rcasesPatMed [(Std.Tactic.RCases.rcasesPat.one `ho)])
-            [])]
-          "⟩"))]
-       [])
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Tactic.refine'
-       "refine'"
-       (Term.fun
-        "fun"
-        (Term.basicFun
-         [`h]
-         []
-         "=>"
-         (Term.app
-          (Term.proj
-           (Term.proj (Term.app `nhds_basis_opens [(Term.hole "_")]) "." `ge_iff)
-           "."
-           (fieldIdx "2"))
-          [(Term.hole "_")]))))
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Term.fun
-       "fun"
-       (Term.basicFun
-        [`h]
-        []
-        "=>"
-        (Term.app
-         (Term.proj
-          (Term.proj (Term.app `nhds_basis_opens [(Term.hole "_")]) "." `ge_iff)
-          "."
-          (fieldIdx "2"))
-         [(Term.hole "_")])))
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Term.app
-       (Term.proj
-        (Term.proj (Term.app `nhds_basis_opens [(Term.hole "_")]) "." `ge_iff)
-        "."
-        (fieldIdx "2"))
-       [(Term.hole "_")])
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Term.hole', expected 'Lean.Parser.Term.namedArgument'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Term.hole', expected 'Lean.Parser.Term.ellipsis'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Term.hole "_")
-[PrettyPrinter.parenthesize] ...precedences are 1023 >? 1024, (none,
-     [anonymous]) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1022, term))
-      (Term.proj
-       (Term.proj (Term.app `nhds_basis_opens [(Term.hole "_")]) "." `ge_iff)
-       "."
-       (fieldIdx "2"))
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1024, term))
-      (Term.proj (Term.app `nhds_basis_opens [(Term.hole "_")]) "." `ge_iff)
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1024, term))
-      (Term.app `nhds_basis_opens [(Term.hole "_")])
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Term.hole', expected 'Lean.Parser.Term.namedArgument'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Term.hole', expected 'Lean.Parser.Term.ellipsis'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Term.hole "_")
-[PrettyPrinter.parenthesize] ...precedences are 1023 >? 1024, (none,
-     [anonymous]) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] parenthesizing (cont := (some 1022, term))
-      `nhds_basis_opens
-[PrettyPrinter.parenthesize] ...precedences are 1024 >? 1024, (none,
-     [anonymous]) <=? (some 1022, term)
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022, (some 1023, term) <=? (some 1024, term)
-[PrettyPrinter.parenthesize] parenthesized: (Term.paren
-     "("
-     (Term.app `nhds_basis_opens [(Term.hole "_")])
-     ")")
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1024, (none, [anonymous]) <=? (some 1024, term)
-[PrettyPrinter.parenthesize] ...precedences are 1024 >? 1024, (none,
-     [anonymous]) <=? (some 1022, term)
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022, (some 1023, term) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.strictImplicitBinder'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.implicitBinder'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'ident', expected 'Lean.Parser.Term.instBinder'
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      `h
-[PrettyPrinter.parenthesize] ...precedences are 1024 >? 1024, (none,
-     [anonymous]) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1024, (some 0, term) <=? (none, [anonymous])
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022
-[PrettyPrinter.parenthesize] ...precedences are 0 >? 1022
-[PrettyPrinter.parenthesize] parenthesizing (cont := (none, [anonymous]))
-      (Tactic.tfaeHave "tfae_have" [] (num "5") "→" (num "1"))
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind '«→»', expected 'token.« → »'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind '«→»', expected 'token.« ↔ »'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind '«→»', expected 'token.« ← »'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.declValSimple', expected 'Lean.Parser.Command.declValEqns'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.declValSimple', expected 'Lean.Parser.Command.whereStructInst'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.opaque'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.instance'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.axiom'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.example'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.inductive'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.classInductive'
-[PrettyPrinter.parenthesize.backtrack] unexpected node kind 'Lean.Parser.Command.theorem', expected 'Lean.Parser.Command.structure'-/-- failed to format: format: uncaught backtrack exception
-/--
-    A collection of equivalent definitions of `x ⤳ y`. The public API is given by `iff` lemmas
-    below. -/
-  theorem
-    specializes_tFAE
-    ( x y : X )
-      :
-        TFAE
-          [
-            x ⤳ y
-              ,
-              pure x ≤ 𝓝 y
-              ,
-              ∀ s : Set X , IsOpen s → y ∈ s → x ∈ s
-              ,
-              ∀ s : Set X , IsClosed s → x ∈ s → y ∈ s
-              ,
-              y ∈ closure ( { x } : Set X )
-              ,
-              closure ( { y } : Set X ) ⊆ closure { x }
-              ,
-              ClusterPt y pure x
-            ]
-    :=
-      by
-        tfae_have 1 → 2
-          ;
-          exact pure_le_nhds _ . trans
-          tfae_have 2 → 3
-          ;
-          exact fun h s hso hy => h hso . mem_nhds hy
-          tfae_have 3 → 4
-          ;
-          exact fun h s hsc hx => of_not_not fun hy => h s ᶜ hsc . is_open_compl hy hx
-          tfae_have 4 → 5
-          ;
-          exact fun h => h _ isClosed_closure subset_closure <| mem_singleton _
-          tfae_have 6 ↔ 5
-          ;
-          exact is_closed_closure.closure_subset_iff.trans singleton_subset_iff
-          tfae_have 5 ↔ 7
-          ;
-          · rw [ mem_closure_iff_clusterPt , principal_singleton ]
-          tfae_have 5 → 1
-          ·
-            refine' fun h => nhds_basis_opens _ . ge_iff . 2 _
-              rintro s ⟨ hy , ho ⟩
-              rcases mem_closure_iff . 1 h s ho hy with ⟨ z , hxs , rfl : z = x ⟩
-              exact ho.mem_nhds hxs
-          tfae_finish
+/-- A collection of equivalent definitions of `x ⤳ y`. The public API is given by `iff` lemmas
+below. -/
+theorem specializes_TFAE ( x y : X ) :
+    TFAE [x ⤳ y,
+      pure x ≤ 𝓝 y,
+      ∀ s : Set X , IsOpen s → y ∈ s → x ∈ s,
+      ∀ s : Set X , IsClosed s → x ∈ s → y ∈ s,
+      y ∈ closure ({ x } : Set X),
+      closure ({ y } : Set X) ⊆ closure { x },
+      ClusterPt y pure x] := by
+  tfae_have 1 → 2; exact pure_le_nhds _ . trans
+  tfae_have 2 → 3; exact fun h s hso hy => h hso . mem_nhds hy
+  tfae_have 3 → 4; exact fun h s hsc hx => of_not_not fun hy => h s ᶜ hsc . is_open_compl hy hx
+  tfae_have 4 → 5; exact fun h => h _ isClosed_closure subset_closure <| mem_singleton _
+  tfae_have 6 ↔ 5; exact is_closed_closure.closure_subset_iff.trans singleton_subset_iff
+  tfae_have 5 ↔ 7; rw [ mem_closure_iff_clusterPt, principal_singleton ]
+  tfae_have 5 → 1
+  · refine' fun h => nhds_basis_opens _ . ge_iff . 2 _
+    rintro s ⟨ hy , ho ⟩
+    rcases mem_closure_iff . 1 h s ho hy with ⟨ z , hxs , rfl : z = x ⟩
+    exact ho.mem_nhds hxs
+  tfae_finish
 #align specializes_tfae specializes_tFAE
 
 theorem specializes_iff_nhds : x ⤳ y ↔ 𝓝 x ≤ 𝓝 y :=
@@ -748,7 +101,7 @@ theorem specializes_iff_nhds : x ⤳ y ↔ 𝓝 x ≤ 𝓝 y :=
 #align specializes_iff_nhds specializes_iff_nhds
 
 theorem specializes_iff_pure : x ⤳ y ↔ pure x ≤ 𝓝 y :=
-  (specializes_tFAE x y).out 0 1
+  (specializes_TFAE x y).out 0 1
 #align specializes_iff_pure specializes_iff_pure
 
 alias specializes_iff_nhds ↔ Specializes.nhds_le_nhds _
@@ -758,7 +111,7 @@ alias specializes_iff_pure ↔ Specializes.pure_le_nhds _
 #align specializes.pure_le_nhds Specializes.pure_le_nhds
 
 theorem specializes_iff_forall_open : x ⤳ y ↔ ∀ s : Set X, IsOpen s → y ∈ s → x ∈ s :=
-  (specializes_tFAE x y).out 0 2
+  (specializes_TFAE x y).out 0 2
 #align specializes_iff_forall_open specializes_iff_forall_open
 
 theorem Specializes.mem_open (h : x ⤳ y) (hs : IsOpen s) (hy : y ∈ s) : x ∈ s :=
@@ -770,7 +123,7 @@ theorem IsOpen.not_specializes (hs : IsOpen s) (hx : x ∉ s) (hy : y ∈ s) : �
 #align is_open.not_specializes IsOpen.not_specializes
 
 theorem specializes_iff_forall_closed : x ⤳ y ↔ ∀ s : Set X, IsClosed s → x ∈ s → y ∈ s :=
-  (specializes_tFAE x y).out 0 3
+  (specializes_TFAE x y).out 0 3
 #align specializes_iff_forall_closed specializes_iff_forall_closed
 
 theorem Specializes.mem_closed (h : x ⤳ y) (hs : IsClosed s) (hx : x ∈ s) : y ∈ s :=
@@ -782,14 +135,14 @@ theorem IsClosed.not_specializes (hs : IsClosed s) (hx : x ∈ s) (hy : y ∉ s)
 #align is_closed.not_specializes IsClosed.not_specializes
 
 theorem specializes_iff_mem_closure : x ⤳ y ↔ y ∈ closure ({x} : Set X) :=
-  (specializes_tFAE x y).out 0 4
+  (specializes_TFAE x y).out 0 4
 #align specializes_iff_mem_closure specializes_iff_mem_closure
 
 alias specializes_iff_mem_closure ↔ Specializes.mem_closure _
 #align specializes.mem_closure Specializes.mem_closure
 
 theorem specializes_iff_closure_subset : x ⤳ y ↔ closure ({y} : Set X) ⊆ closure {x} :=
-  (specializes_tFAE x y).out 0 5
+  (specializes_TFAE x y).out 0 5
 #align specializes_iff_closure_subset specializes_iff_closure_subset
 
 alias specializes_iff_closure_subset ↔ Specializes.closure_subset _
@@ -828,12 +181,12 @@ theorem specializes_of_nhdsWithin (h₁ : 𝓝[s] x ≤ 𝓝[s] y) (h₂ : x ∈
 #align specializes_of_nhds_within specializes_of_nhdsWithin
 
 theorem Specializes.map_of_continuousAt (h : x ⤳ y) (hy : ContinuousAt f y) : f x ⤳ f y :=
-  specializes_iff_pure.2 fun s hs =>
+  specializes_iff_pure.2 fun _s hs =>
     mem_pure.2 <| mem_preimage.1 <| mem_of_mem_nhds <| hy.mono_left h hs
 #align specializes.map_of_continuous_at Specializes.map_of_continuousAt
 
 theorem Specializes.map (h : x ⤳ y) (hf : Continuous f) : f x ⤳ f y :=
-  h.map_of_continuous_at hf.ContinuousAt
+  h.map_of_continuousAt hf.continuousAt
 #align specializes.map Specializes.map
 
 theorem Inducing.specializes_iff (hf : Inducing f) : f x ⤳ f y ↔ x ⤳ y := by
@@ -842,7 +195,7 @@ theorem Inducing.specializes_iff (hf : Inducing f) : f x ⤳ f y ↔ x ⤳ y := 
 #align inducing.specializes_iff Inducing.specializes_iff
 
 theorem subtype_specializes_iff {p : X → Prop} (x y : Subtype p) : x ⤳ y ↔ (x : X) ⤳ y :=
-  inducing_coe.specializes_iff.symm
+  inducing_subtype_val.specializes_iff.symm
 #align subtype_specializes_iff subtype_specializes_iff
 
 @[simp]
@@ -888,7 +241,7 @@ variable {X}
 /-- A continuous function is monotone with respect to the specialization preorders on the domain and
 the codomain. -/
 theorem Continuous.specialization_monotone (hf : Continuous f) :
-    @Monotone _ _ (specializationPreorder X) (specializationPreorder Y) f := fun x y h => h.map hf
+    @Monotone _ _ (specializationPreorder X) (specializationPreorder Y) f := fun _ _ h => h.map hf
 #align continuous.specialization_monotone Continuous.specialization_monotone
 
 /-!
@@ -938,7 +291,7 @@ theorem inseparable_iff_forall_open : (x ~ y) ↔ ∀ s : Set X, IsOpen s → (x
 #align inseparable_iff_forall_open inseparable_iff_forall_open
 
 theorem not_inseparable_iff_exists_open : ¬(x ~ y) ↔ ∃ s : Set X, IsOpen s ∧ Xor' (x ∈ s) (y ∈ s) :=
-  by simp [inseparable_iff_forall_open, ← xor'_iff_not_iff]
+  by simp [inseparable_iff_forall_open, ← xor_iff_not_iff]
 #align not_inseparable_iff_exists_open not_inseparable_iff_exists_open
 
 theorem inseparable_iff_forall_closed : (x ~ y) ↔ ∀ s : Set X, IsClosed s → (x ∈ s ↔ y ∈ s) := by
@@ -948,7 +301,7 @@ theorem inseparable_iff_forall_closed : (x ~ y) ↔ ∀ s : Set X, IsClosed s �
 
 theorem inseparable_iff_mem_closure :
     (x ~ y) ↔ x ∈ closure ({y} : Set X) ∧ y ∈ closure ({x} : Set X) :=
-  inseparable_iff_specializes_and.trans <| by simp only [specializes_iff_mem_closure, and_comm']
+  inseparable_iff_specializes_and.trans <| by simp only [specializes_iff_mem_closure, and_comm]
 #align inseparable_iff_mem_closure inseparable_iff_mem_closure
 
 theorem inseparable_iff_closure_eq : (x ~ y) ↔ closure ({x} : Set X) = closure {y} := by
@@ -965,7 +318,7 @@ theorem Inducing.inseparable_iff (hf : Inducing f) : (f x ~ f y) ↔ (x ~ y) := 
 #align inducing.inseparable_iff Inducing.inseparable_iff
 
 theorem subtype_inseparable_iff {p : X → Prop} (x y : Subtype p) : (x ~ y) ↔ ((x : X) ~ y) :=
-  inducing_coe.inseparable_iff.symm
+  inducing_subtype_val.inseparable_iff.symm
 #align subtype_inseparable_iff subtype_inseparable_iff
 
 @[simp]
@@ -999,17 +352,14 @@ theorem of_eq (e : x = y) : Inseparable x y :=
 #align inseparable.of_eq Inseparable.of_eq
 
 @[symm]
-theorem symm (h : x ~ y) : y ~ x :=
-  h.symm
+nonrec theorem symm (h : x ~ y) : y ~ x := h.symm
 #align inseparable.symm Inseparable.symm
 
 @[trans]
-theorem trans (h₁ : x ~ y) (h₂ : y ~ z) : x ~ z :=
-  h₁.trans h₂
+nonrec theorem trans (h₁ : x ~ y) (h₂ : y ~ z) : x ~ z := h₁.trans h₂
 #align inseparable.trans Inseparable.trans
 
-theorem nhds_eq (h : x ~ y) : 𝓝 x = 𝓝 y :=
-  h
+theorem nhds_eq (h : x ~ y) : 𝓝 x = 𝓝 y := h
 #align inseparable.nhds_eq Inseparable.nhds_eq
 
 theorem mem_open_iff (h : x ~ y) (hs : IsOpen s) : x ∈ s ↔ y ∈ s :=
@@ -1022,7 +372,7 @@ theorem mem_closed_iff (h : x ~ y) (hs : IsClosed s) : x ∈ s ↔ y ∈ s :=
 
 theorem map_of_continuousAt (h : x ~ y) (hx : ContinuousAt f x) (hy : ContinuousAt f y) :
     f x ~ f y :=
-  (h.Specializes.map_of_continuous_at hy).antisymm (h.specializes'.map_of_continuous_at hx)
+  (h.specializes.map_of_continuousAt hy).antisymm (h.specializes'.map_of_continuousAt hx)
 #align inseparable.map_of_continuous_at Inseparable.map_of_continuousAt
 
 theorem map (h : x ~ y) (hf : Continuous f) : f x ~ f y :=
@@ -1050,13 +400,12 @@ variable (X)
 
 /-- A `setoid` version of `inseparable`, used to define the `separation_quotient`. -/
 def inseparableSetoid : Setoid X :=
-  { Setoid.comap 𝓝 ⊥ with R := (· ~ ·) }
+  { Setoid.comap 𝓝 ⊥ with r := inseparable }
 #align inseparable_setoid inseparableSetoid
 
 /-- The quotient of a topological space by its `inseparable_setoid`. This quotient is guaranteed to
 be a T₀ space. -/
-def SeparationQuotient :=
-  Quotient (inseparableSetoid X)deriving TopologicalSpace
+def SeparationQuotient := Quotient (inseparableSetoid X) deriving TopologicalSpace
 #align separation_quotient SeparationQuotient
 
 variable {X} {t : Set (SeparationQuotient X)}
