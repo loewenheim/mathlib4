@@ -71,12 +71,10 @@ instance decidableEq [DecidableEq α] : DecidableEq (Multiset α)
 
 /-- defines a size for a multiset by referring to the size of the underlying list -/
 protected
-noncomputable -- Porting note: added
 def sizeOf [SizeOf α] (s : Multiset α) : ℕ :=
   (Quot.liftOn s SizeOf.sizeOf) fun _ _ => Perm.sizeOf_eq_sizeOf
 #align multiset.sizeof Multiset.sizeOf
 
-noncomputable -- Porting note: added
 instance [SizeOf α] : SizeOf (Multiset α) :=
   ⟨Multiset.sizeOf⟩
 
@@ -178,7 +176,6 @@ TODO: should be @[recursor 6], but then the definition of `Multiset.pi` fails wi
 overflow in `whnf`.
 -/
 protected
-noncomputable -- Porting note: added
 def rec (C_0 : C 0) (C_cons : ∀ a m, C m → C (a ::ₘ m))
     (C_cons_heq :
       ∀ a a' m b, HEq (C_cons a (a' ::ₘ m) (C_cons a' m b)) (C_cons a' (a ::ₘ m) (C_cons a m b)))
@@ -192,7 +189,6 @@ def rec (C_0 : C 0) (C_cons : ∀ a m, C m → C (a ::ₘ m))
 /-- Companion to `Multiset.rec` with more convenient argument order. -/
 @[elab_as_elim]
 protected
-noncomputable -- Porting note: added
 def recOn (m : Multiset α) (C_0 : C 0) (C_cons : ∀ a m, C m → C (a ::ₘ m))
     (C_cons_heq :
       ∀ a a' m b, HEq (C_cons a (a' ::ₘ m) (C_cons a' m b)) (C_cons a' (a ::ₘ m) (C_cons a m b))) :
@@ -2845,7 +2841,7 @@ theorem Rel.trans (r : α → α → Prop) [IsTrans α r] {s t u : Multiset α} 
   · rw [rel_zero_right.mp r1, rel_zero_left.mp r2, rel_zero_left]
   · obtain ⟨a, as, ha1, ha2, rfl⟩ := rel_cons_right.mp r1
     obtain ⟨b, bs, hb1, hb2, rfl⟩ := rel_cons_left.mp r2
-    exact Multiset.Rel.cons (trans ha1 hb1) (ih ha2 hb2)
+    exact Multiset.Rel.cons (_root_.trans ha1 hb1) (ih ha2 hb2)
 #align multiset.rel.trans Multiset.Rel.trans
 
 theorem Rel.countp_eq (r : α → α → Prop) [IsTrans α r] [IsSymm α r] {s t : Multiset α} (x : α)
@@ -2856,7 +2852,7 @@ theorem Rel.countp_eq (r : α → α → Prop) [IsTrans α r] [IsSymm α r] {s t
   · obtain ⟨b, bs, hb1, hb2, rfl⟩ := rel_cons_left.mp h
     rw [countp_cons, countp_cons, ih hb2]
     simp only [decide_eq_true_eq, add_right_inj]
-    refine' (if_congr ⟨fun h => trans h hb1, fun h => trans h (symm hb1)⟩ rfl rfl)
+    refine' (if_congr ⟨fun h => _root_.trans h hb1, fun h => _root_.trans h (symm hb1)⟩ rfl rfl)
 #align multiset.rel.countp_eq Multiset.Rel.countp_eq
 
 end Rel

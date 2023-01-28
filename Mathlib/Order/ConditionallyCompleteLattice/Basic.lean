@@ -771,8 +771,8 @@ theorem le_csupᵢ_of_le {f : ι → α} (H : BddAbove (range f)) (c : ι) (h : 
 #align le_csupr_of_le le_csupᵢ_of_le
 
 /-- The indexed supremum of two functions are comparable if the functions are pointwise comparable-/
-theorem csupᵢ_mono {f g : ι → α} (B : BddAbove (range g)) (H : ∀ x, f x ≤ g x) : supᵢ f ≤ supᵢ g :=
-  by
+theorem csupᵢ_mono {f g : ι → α} (B : BddAbove (range g)) (H : ∀ x, f x ≤ g x) :
+    supᵢ f ≤ supᵢ g := by
   cases isEmpty_or_nonempty ι
   · rw [supᵢ_of_empty', supᵢ_of_empty']
   · exact csupᵢ_le fun x => le_csupᵢ_of_le B x (H x)
@@ -828,10 +828,17 @@ theorem cinfᵢ_unique [Unique ι] {s : ι → α} : (⨅ i, s i) = s default :=
   @csupᵢ_unique αᵒᵈ _ _ _ _
 #align infi_unique cinfᵢ_unique
 
+-- porting note: new lemma
+theorem csupᵢ_subsingleton [Subsingleton ι] (i : ι) (s : ι → α) : (⨆ i, s i) = s i :=
+  @csupᵢ_unique α ι _ ⟨⟨i⟩, fun j => Subsingleton.elim j i⟩ _
+
+-- porting note: new lemma
+theorem cinfᵢ_subsingleton [Subsingleton ι] (i : ι) (s : ι → α) : (⨅ i, s i) = s i :=
+  @cinfᵢ_unique α ι _ ⟨⟨i⟩, fun j => Subsingleton.elim j i⟩ _
+
 @[simp]
 theorem csupᵢ_pos {p : Prop} {f : p → α} (hp : p) : (⨆ h : p, f h) = f hp :=
-  haveI := uniqueProp hp
-  csupᵢ_unique
+  csupᵢ_subsingleton hp f
 #align csupr_pos csupᵢ_pos
 
 @[simp]
