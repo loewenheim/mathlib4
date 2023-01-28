@@ -203,7 +203,7 @@ theorem DenseRange.quotient [Setoid α] [TopologicalSpace α] {f : β → α} (h
 #align dense_range.quotient DenseRange.quotient
 
 instance {p : α → Prop} [TopologicalSpace α] [DiscreteTopology α] : DiscreteTopology (Subtype p) :=
-  ⟨bot_unique fun s _ => ⟨(↑) '' s, isOpen_discrete _, Set.preimage_image_eq _ Subtype.coe_injective⟩⟩
+  ⟨bot_unique fun s _ => ⟨(↑) '' s, isOpen_discrete _, preimage_image_eq _ Subtype.val_injective⟩⟩
 
 instance Sum.discreteTopology [TopologicalSpace α] [TopologicalSpace β] [hα : DiscreteTopology α]
     [hβ : DiscreteTopology β] : DiscreteTopology (Sum α β) :=
@@ -1460,7 +1460,7 @@ theorem continuous_sigma {f : Sigma σ → α} (hf : ∀ i, Continuous fun a => 
   continuous_sigma_iff.2 hf
 #align continuous_sigma continuous_sigma
 
-@[simp]
+@[simp 1100]
 theorem continuous_sigma_map {f₁ : ι → κ} {f₂ : ∀ i, σ i → τ (f₁ i)} :
     Continuous (Sigma.map f₁ f₂) ↔ ∀ i, Continuous (f₂ i) :=
   continuous_sigma_iff.trans <| by simp only [Sigma.map, embedding_sigmaMk.continuous_iff, comp]
@@ -1514,4 +1514,3 @@ theorem continuous_uLift_up [TopologicalSpace α] : Continuous (ULift.up : α �
 #align continuous_ulift_up continuous_uLift_up
 
 end ULift
-
