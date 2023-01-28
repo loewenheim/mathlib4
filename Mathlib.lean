@@ -880,12 +880,17 @@ import Mathlib.Tactic.Zify.Attr
 import Mathlib.Testing.SlimCheck.Gen
 import Mathlib.Testing.SlimCheck.Sampleable
 import Mathlib.Testing.SlimCheck.Testable
+import Mathlib.Topology.Bases
 import Mathlib.Topology.Basic
 import Mathlib.Topology.Bornology.Basic
 import Mathlib.Topology.Bornology.Constructions
 import Mathlib.Topology.Bornology.Hom
+import Mathlib.Topology.Constructions
+import Mathlib.Topology.ContinuousOn
 import Mathlib.Topology.LocallyFinite
+import Mathlib.Topology.Maps
 import Mathlib.Topology.NhdsSet
+import Mathlib.Topology.Order
 import Mathlib.Topology.SubsetProperties
 import Mathlib.Util.AtomM
 import Mathlib.Util.Export
