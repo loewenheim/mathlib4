@@ -275,6 +275,7 @@ theorem isOpen_top_iff {α} (U : Set α) : @IsOpen _ ⊤ U ↔ U = ∅ ∨ U = u
 
 /-- A topological space is discrete if every set is open, that is,
   its topology equals the discrete topology `⊥`. -/
+@[mk_iff discreteTopology_iff_eq_bot]
 class DiscreteTopology (α : Type _) [t : TopologicalSpace α] : Prop where
   /-- The `TopologicalSpace` structure on a type with discrete topology is equal to `⊥`. -/
   eq_bot : t = ⊥
