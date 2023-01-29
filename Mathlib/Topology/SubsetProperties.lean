@@ -571,9 +571,9 @@ theorem Tendsto.isCompact_insert_range_of_cocompact {f : α → β} {b}
 
 theorem Tendsto.isCompact_insert_range_of_cofinite {f : ι → α} {a} (hf : Tendsto f cofinite (𝓝 a)) :
     IsCompact (insert a (range f)) := by
-  letI : TopologicalSpace ι := ⊥; haveI : DiscreteTopology ι := ⟨rfl⟩
-  rw [← cocompact_eq_cofinite] at hf
-  exact Tendsto.isCompact_insert_range_of_cocompact hf continuous_of_discreteTopology
+  letI : TopologicalSpace ι := ⊥; haveI h : DiscreteTopology ι := ⟨rfl⟩
+  rw [← cocompact_eq_cofinite ι] at hf
+  exact hf.isCompact_insert_range_of_cocompact continuous_of_discreteTopology
 #align filter.tendsto.is_compact_insert_range_of_cofinite Filter.Tendsto.isCompact_insert_range_of_cofinite
 
 theorem Tendsto.isCompact_insert_range {f : ℕ → α} {a} (hf : Tendsto f atTop (𝓝 a)) :
