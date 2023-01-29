@@ -15,11 +15,15 @@ This file adds `norm_num` plugins for `+`, `*` and `^` along with other basic op
 -/
 
 namespace Mathlib
-open Lean hiding Rat
+open Lean hiding Rat mkRat
 open Meta
 
 namespace Meta.NormNum
 open Qq
+
+/-
+# Constructors and constants
+-/
 
 theorem isNat_zero (α) [AddMonoidWithOne α] : IsNat (Zero.zero : α) (nat_lit 0) :=
   ⟨Nat.cast_zero.symm⟩
@@ -51,6 +55,23 @@ theorem isNat_ofNat (α : Type u_1) [AddMonoidWithOne α] {a : α} {n : ℕ}
     let ⟨a, (pa : Q($n = $e))⟩ ← mkOfNat α sα n
     guard <|← isDefEq a e
     return .isNat sα n (q(isNat_ofNat $α $pa) : Expr)
+
+theorem isNat_intOfNat: {n n' : ℕ} → IsNat n n' → IsNat (Int.ofNat n) n'
+  | _, _, ⟨rfl⟩ => ⟨rfl⟩
+
+/-- The `norm_num` extension which identifies the constructor `Int.ofNat n`, returning `n`. -/
+@[norm_num Int.ofNat _] def evalIntOfNat : NormNumExt where eval {u α} e := do
+  let .app _ (n : Q(ℕ)) ← whnfR e | failure
+  guard <| α.isConstOf ``Int
+  let sℕ : Q(AddMonoidWithOne ℕ) := q(AddCommMonoidWithOne.toAddMonoidWithOne)
+  let sℤ : Q(AddMonoidWithOne ℤ) := q(AddGroupWithOne.toAddMonoidWithOne)
+  let ⟨n', p⟩ ← deriveNat n sℕ
+  return (.isNat sℤ n' q(isNat_intOfNat $p): Result q(Int.ofNat $n))
+
+
+/-
+# Casts
+-/
 
 theorem isNat_cast {R} [AddMonoidWithOne R] (n m : ℕ) :
     IsNat n m → IsNat (n : R) m := by rintro ⟨⟨⟩⟩; exact ⟨rfl⟩
@@ -85,79 +106,43 @@ theorem isInt_cast {R} [Ring R] (n m : ℤ) :
       return (.isNegNat rα na q(isInt_cast $a (.negOfNat $na) $pa) : Result q(Int.cast $a : $α))
     | _ => failure
 
---TODO: clean up
-theorem isRat_ofScientific_of_true [DivisionRing α] [CharZero α] [OfScientific α] [LawfulOfScientific α] : {m e nm ne k : ℕ} → {q : ℚ} →
-    IsNat m nm → IsNat e ne → nm = Int.mul k q.num → Nat.mul k q.den = (10 : ℕ) ^ ne → IsRat (OfScientific.ofScientific (α := α) m true e) q.num q.den
-  | _, e, _, _, _, q, ⟨rfl⟩, ⟨rfl⟩, h₁, h₂ =>
-    have := invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| q.den_nz
-    ⟨_,
-    by
-      simp [LawfulOfScientific.ofScientific_eq, Rat.normalize_eq_mkRat, Rat.ofScientific, h₁, ←h₂]
-      rw [← mul_right_inj_of_invertible (q.den : α), Rat.mkRat_mul_left,
-        ← Rat.mk_eq_mkRat q.num q.den q.den_nz q.reduced, DivisionRing.ratCast_mk, ← invOf_eq_inv]
-      have h₃ := h₂.symm ▸ pow_pos (a := 10) (by decide) e
-      exact Nat.pos_iff_ne_zero.1 <| pos_of_mul_pos_left h₃ <| zero_le q.den
-    ⟩
+theorem isNat_ratCast [DivisionRing R] : {q : ℚ} → {n : ℕ} →
+    IsNat q n → IsNat (q : R) n
+  | _, _, ⟨rfl⟩ => ⟨by simp⟩
 
-theorem isNat_ofScientific_of_false [dα : DivisionRing α] [i : OfScientific α] [l : LawfulOfScientific α] : {m e nm ne : ℕ} → {n : ℕ} →
-    IsNat m nm → IsNat e ne → n = Nat.mul nm ((10 : ℕ) ^ e) → IsNat (i.ofScientific m false e) n
-  | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h => ⟨by simp [l.ofScientific_eq, Rat.ofScientific, h]; norm_cast⟩
+theorem isInt_ratCast [DivisionRing R] : {q : ℚ} → {n : ℤ} →
+    IsInt q n → IsInt (q : R) n
+  | _, _, ⟨rfl⟩ => ⟨by simp⟩
 
---TODO: clean up
-theorem isRat_ofScientific_of_true' [DivisionRing α] [CharZero α] : {m e nm ne d k : ℕ} → {n : ℤ} →
-    IsNat m nm → IsNat e ne → nm = Int.mul k n → Nat.mul k (Nat.succ d) = (10 : ℕ) ^ ne → IsRat ((Rat.ofScientific m true e) : α) n (Nat.succ d)
-  | _, e, _, _, d, _, _, ⟨rfl⟩, ⟨rfl⟩, h₁, h₂ => ⟨
-    invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| Nat.succ_ne_zero d,
-    by
-      simp [Rat.ofScientific, Rat.normalize_eq_mkRat, h₁, ←h₂]
-      have := invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| Nat.succ_ne_zero d
-      rw [← mul_right_inj_of_invertible <| (Nat.succ d : α), Rat.mkRat_mul_left, Rat.mkRat_eq]
-      have : Nat.succ d ≠ 0 := by simp
-      norm_cast
-      simp only [mul_invOf_mul_self_cancel']
-      rw [Rat.coe_nat_eq_divInt <| Nat.succ d, Rat.divInt_mul_divInt_cancel, Rat.divInt_one]
-      simp
-      norm_cast
-      have h₃ := h₂.symm ▸ pow_pos (a := 10) (by decide) e
-      exact Nat.pos_iff_ne_zero.1 <| pos_of_mul_pos_left h₃ (by simp)
-    ⟩
+theorem isRat_ratCast [DivisionRing R] [CharZero R]: {q : ℚ} → {n : ℤ} → {d : ℕ} →
+    IsRat q n d → IsRat (q : R) n d
+  | _, _, _, ⟨⟨qi,_,_⟩, rfl⟩ => ⟨⟨qi, by norm_cast, by norm_cast⟩, by simp only []; norm_cast⟩
 
-/-- The `norm_num` extension which identifies expressions in scientific notation, normalizing them
-to rat casts if the scientific notation is inherited from the one for rationals. -/
-@[norm_num OfScientific.ofScientific _ _ _] def evalOfScientific :
-    NormNumExt where eval {u α} e := do
-  let .app (.app (.app f (m : Q(ℕ))) (b : Q(Bool))) (exp : Q(ℕ)) ← whnfR e | failure
-  let sα ← inferOfScientific α
-  let rα ← inferRatCast α
-  let _lsα ← inferLawfulOfScientific rα sα
-  guard <|← withNewMCtxDepth <| isDefEq f q(OfScientific.ofScientific (α := $α))
-  --!! Why do we check for defeq sometimes and not others? When is matching on q appropriate?
-  match b with
-  | ~q(true)  =>
-    let ⟨nm, pm⟩ ← deriveNat m q(AddCommMonoidWithOne.toAddMonoidWithOne)
-    let ⟨ne, pe⟩ ← deriveNat exp q(AddCommMonoidWithOne.toAddMonoidWithOne)
-    have pm : Q(IsNat $m $nm) := pm
-    have pe : Q(IsNat $exp $ne) := pe
-    let m' := m.natLit!
-    let exp' := exp.natLit!
-    let qs : ℚ := (m' : ℕ) / ((10 ^ exp') : ℕ)
-    let k := ((10 ^ exp') : ℕ) / qs.den
-    have k : Q(ℕ) := mkRawNatLit k
-    have qn : Q(ℤ) := mkRawIntLit qs.num
-    have qd : Q(ℕ) := mkRawNatLit qs.den
-    have q : Q(ℚ) := mkRawRatLit qs
-    have r1 : Q($nm = Int.mul $k ($q).num) := (q(Eq.refl $nm) : Expr)
-    have r2 : Q(Nat.mul $k $qd = (10 : ℕ) ^ $ne) := (q(Eq.refl (Nat.mul $k $qd)) : Expr)
-    if let some dα ← inferDivisionRing? α then
-      if let some _i ← inferCharZeroOfDivisionRing? α then
-        failure
-      else
-        failure
-    else
-      failure
-  | ~q(false) => failure
+/-- The `norm_num` extension which identifies an expression `RatCast.ratCast q` where `norm_num` recognizes `q`, returning the cast of `q`. -/
+@[norm_num RatCast.ratCast _] def evalRatCast : NormNumExt where eval {u α} e := do
+  let dα ← inferDivisionRing α
+  match e with
+  | ~q(RatCast.ratCast $a) =>
+    let r ← derive (α := q(ℚ)) a
+    match r with
+    | .isNat _ na pa =>
+      let sα : Q(AddMonoidWithOne $α) := q(instAddMonoidWithOne)
+      let pa : Q(@IsNat _ instAddMonoidWithOne $a $na) := pa
+      return (.isNat sα na q(@isNat_ratCast $α _ $a $na $pa) : Result q(RatCast.ratCast $a : $α))
+    | .isNegNat _ na pa =>
+      let rα : Q(Ring $α) := q(instRing)
+      let pa : Q(@IsInt _ instRing $a (.negOfNat $na)) := pa
+      return (.isNegNat rα na q(@isInt_ratCast $α _ $a (.negOfNat $na) $pa) : Result q(RatCast.ratCast $a : $α))
+    | .isRat _ qa na da pa =>
+      let i ← inferCharZeroOfDivisionRing dα
+      let pa : Q(@IsRat _ instRingRat $a $na $da) := pa
+      return (.isRat dα qa na da q(isRat_ratCast $pa) : Result q(RatCast.ratCast $a : $α))
+    | _ => failure
 
-#exit
+
+/-
+# Arithmetic
+-/
 
 theorem isNat_add {α} [AddMonoidWithOne α] : {a b : α} → {a' b' c : ℕ} →
     IsNat a a' → IsNat b b' → Nat.add a' b' = c → IsNat (a + b) c
@@ -542,6 +527,94 @@ such that `norm_num` successfully recognises both `a` and `b`. -/
   let pa : Q(IsRat ($a * $b⁻¹) $na $da) := pa
   return (.isRat' dα qa na da q(isRat_div $pa) : Result q($a / $b))
 
+
+/-
+# Constructor-like operations
+-/
+
+--TODO : move
+theorem mkRat_eq_div {n : ℤ} {d : ℕ} : mkRat n d = (n / d : ℚ) := by
+  simp [mkRat]
+  by_cases d = 0
+  · simp [h]
+  · simp [h, HDiv.hDiv, Div.div]
+    unfold Rat.inv
+    have h₁ : ¬ (d : ℤ) < 0 := by simp
+    have h₂ : 0 < d := Nat.pos_iff_ne_zero.2 h
+    have mkRat_one {n : ℤ} : mkRat n 1 = n := by simp [Rat.mkRat_eq, Rat.divInt_one]
+    simp [h, h₁, h₂, ←Rat.normalize_eq_mk', Rat.normalize_eq_mkRat, ← mkRat_one,
+      Rat.mkRat_mul_mkRat]
+
+theorem isRat_mkRat : {a na n : ℤ} → {b nb d : ℕ} → IsInt a na → IsNat b nb →
+    IsRat (na / nb : ℚ) n d → IsRat (mkRat a b) n d
+  | _, _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, ⟨_, h⟩ => by rw [mkRat_eq_div]; exact ⟨_, h⟩
+
+/-- The `norm_num` extension which identifies expressions of the form `mkRat a b`,
+such that `norm_num` successfully recognises both `a` and `b`, and returns `a / b`. -/
+@[norm_num mkRat _ _] def evalMkRat : NormNumExt where eval {u α} e := do
+  let .app (.app _ (a : Q(ℤ))) (b : Q(ℕ)) ← whnfR e | failure
+  guard <| α.isConstOf ``Rat
+  let ra ← derive a
+  let rℤ : Q(Ring ℤ) := q(Int.instRingInt)
+  let some ⟨_, na, pa⟩ := ra.toInt | failure
+  let sℕ : Q(AddMonoidWithOne ℕ) := q(AddCommMonoidWithOne.toAddMonoidWithOne)
+  let ⟨nb, pb⟩ ← deriveNat b sℕ
+  let rab ← derive (q($na / $nb) : Q(Rat))
+  let dℚ : Q(DivisionRing ℚ) := q(Rat.divisionRing)
+  let ⟨q, n, d, p⟩ ← rab.toRat' dℚ
+  let p : Q(IsRat ($na / $nb : ℚ) $n $d) := p
+  return (.isRat' (inst := dℚ) q n d q(isRat_mkRat $pa $pb $p) : Result q(mkRat $a $b))
+
+theorem isRat_ofScientific_of_true [DivisionRing α] [OfScientific α] [LawfulOfScientific α] : {m e : ℕ} → {n : ℤ} → {d : ℕ} → IsRat (mkRat m (10 ^ e) : α) n d →
+     IsRat (OfScientific.ofScientific (α := α) m true e) n d
+  | _, _, _, _, ⟨_, eq⟩ =>
+    -- have := invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| q.den_nz
+    ⟨_,
+    by
+      simp only [LawfulOfScientific.ofScientific_eq, if_true, Rat.ofScientific,
+        Rat.normalize_eq_mkRat]
+      exact eq
+      ⟩
+
+theorem isNat_ofScientific_of_false [dα : DivisionRing α] [OfScientific α] [LawfulOfScientific α] :
+    {m e nm ne n : ℕ} → IsNat m nm → IsNat e ne → n = Nat.mul nm ((10 : ℕ) ^ ne) →
+    IsNat (OfScientific.ofScientific (α := α) m false e) n
+  | _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h =>
+    ⟨by simp [LawfulOfScientific.ofScientific_eq, Rat.ofScientific, h]; norm_cast⟩
+
+/-- The `norm_num` extension which identifies expressions in scientific notation, normalizing them
+to rat casts if the scientific notation is inherited from the one for rationals. -/
+@[norm_num OfScientific.ofScientific _ _ _] def evalOfScientific :
+    NormNumExt where eval {u α} e := do
+  let .app (.app (.app f (m : Q(ℕ))) (b : Q(Bool))) (exp : Q(ℕ)) ← whnfR e | failure
+  let σα ← inferOfScientific α
+  guard <|← withNewMCtxDepth <| isDefEq f q(OfScientific.ofScientific (α := $α))
+  let dα ← inferDivisionRing α
+  let lσα ← inferLawfulOfScientific dα σα
+  match b with
+  | ~q(true)  =>
+    trace[Tactic.norm_num] "hit"
+    let rme ← derive (q(mkRat $m (10 ^ $exp)) : Q($α))
+    trace[Tactic.norm_num] "{rme}"
+    let some ⟨q, n, d, p⟩ := rme.toRat' | failure
+    let p : Q(IsRat (mkRat $m (10 ^ $exp) : $α) $n $d) := p
+    return (.isRat' dα q n d q(isRat_ofScientific_of_true $p) : Result q(@OfScientific.ofScientific $α $σα $m true $exp))
+  | ~q(false) =>
+    let ⟨nm, pm⟩ ← deriveNat m q(AddCommMonoidWithOne.toAddMonoidWithOne)
+    let ⟨ne, pe⟩ ← deriveNat exp q(AddCommMonoidWithOne.toAddMonoidWithOne)
+    have pm : Q(IsNat $m $nm) := pm
+    have pe : Q(IsNat $exp $ne) := pe
+    let m' := m.natLit!
+    let exp' := exp.natLit!
+    let n' := Nat.mul m' (Nat.pow (10 : ℕ) exp')
+    have n : Q(ℕ) := mkRawNatLit n'
+    have r : Q($n = Nat.mul $nm ((10 : ℕ) ^ $ne)) := (q(Eq.refl $n) : Expr)
+    return ((.isNat _ n
+        (q(isNat_ofScientific_of_false (α := $α) (n := $n) $pm $pe $r) :
+            Q(IsNat (OfScientific.ofScientific (α := $α) $m false $exp) $n))) :
+          Result q(@OfScientific.ofScientific $α $σα $m false $exp))
+
+
 /-
 # Logic
 -/
@@ -566,6 +639,7 @@ such that `norm_num` successfully recognises `a`. -/
     return (.isFalse q(not_not_intro $p) : Result q(¬$a))
   else
     return (.isTrue p : Result q(¬$a))
+
 
 /-
 # (In)equalities
