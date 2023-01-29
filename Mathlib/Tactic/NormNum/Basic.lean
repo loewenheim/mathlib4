@@ -118,7 +118,8 @@ theorem isRat_ratCast [DivisionRing R] [CharZero R]: {q : ℚ} → {n : ℤ} →
     IsRat q n d → IsRat (q : R) n d
   | _, _, _, ⟨⟨qi,_,_⟩, rfl⟩ => ⟨⟨qi, by norm_cast, by norm_cast⟩, by simp only []; norm_cast⟩
 
-/-- The `norm_num` extension which identifies an expression `RatCast.ratCast q` where `norm_num` recognizes `q`, returning the cast of `q`. -/
+/-- The `norm_num` extension which identifies an expression `RatCast.ratCast q` where `norm_num`
+recognizes `q`, returning the cast of `q`. -/
 @[norm_num RatCast.ratCast _] def evalRatCast : NormNumExt where eval {u α} e := do
   let dα ← inferDivisionRing α
   match e with
@@ -132,7 +133,8 @@ theorem isRat_ratCast [DivisionRing R] [CharZero R]: {q : ℚ} → {n : ℤ} →
     | .isNegNat _ na pa =>
       let rα : Q(Ring $α) := q(instRing)
       let pa : Q(@IsInt _ instRing $a (.negOfNat $na)) := pa
-      return (.isNegNat rα na q(@isInt_ratCast $α _ $a (.negOfNat $na) $pa) : Result q(RatCast.ratCast $a : $α))
+      return (.isNegNat rα na q(@isInt_ratCast $α _ $a (.negOfNat $na) $pa) :
+          Result q(RatCast.ratCast $a : $α))
     | .isRat _ qa na da pa =>
       let i ← inferCharZeroOfDivisionRing dα
       let pa : Q(@IsRat _ instRingRat $a $na $da) := pa
@@ -565,8 +567,9 @@ such that `norm_num` successfully recognises both `a` and `b`, and returns `a / 
   let p : Q(IsRat ($na / $nb : ℚ) $n $d) := p
   return (.isRat' (inst := dℚ) q n d q(isRat_mkRat $pa $pb $p) : Result q(mkRat $a $b))
 
-theorem isRat_ofScientific_of_true [DivisionRing α] [OfScientific α] [LawfulOfScientific α] : {m e : ℕ} → {n : ℤ} → {d : ℕ} → IsRat (mkRat m (10 ^ e) : α) n d →
-     IsRat (OfScientific.ofScientific (α := α) m true e) n d
+theorem isRat_ofScientific_of_true [DivisionRing α] [OfScientific α] [LawfulOfScientific α] :
+    {m e : ℕ} → {n : ℤ} → {d : ℕ} → IsRat (mkRat m (10 ^ e) : α) n d →
+    IsRat (OfScientific.ofScientific (α := α) m true e) n d
   | _, _, _, _, ⟨_, eq⟩ =>
     -- have := invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| q.den_nz
     ⟨_,
@@ -598,7 +601,8 @@ to rat casts if the scientific notation is inherited from the one for rationals.
     trace[Tactic.norm_num] "{rme}"
     let some ⟨q, n, d, p⟩ := rme.toRat' | failure
     let p : Q(IsRat (mkRat $m (10 ^ $exp) : $α) $n $d) := p
-    return (.isRat' dα q n d q(isRat_ofScientific_of_true $p) : Result q(@OfScientific.ofScientific $α $σα $m true $exp))
+    return (.isRat' dα q n d q(isRat_ofScientific_of_true $p) :
+        Result q(@OfScientific.ofScientific $α $σα $m true $exp))
   | ~q(false) =>
     let ⟨nm, pm⟩ ← deriveNat m q(AddCommMonoidWithOne.toAddMonoidWithOne)
     let ⟨ne, pe⟩ ← deriveNat exp q(AddCommMonoidWithOne.toAddMonoidWithOne)

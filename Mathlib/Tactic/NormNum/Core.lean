@@ -214,7 +214,8 @@ and `q` is the value of `n / d`. -/
 /-- A shortcut (non)instance for `AddMonoidWithOne α` from `Ring α` to shrink generated proofs. -/
 def instAddMonoidWithOne [Ring α] : AddMonoidWithOne α := inferInstance
 
-/-- A shortcut (non)instance for `AddMonoidWithOne α` from `DivisionRing α` to shrink generated proofs. -/
+/-- A shortcut (non)instance for `AddMonoidWithOne α` from `DivisionRing α` to shrink generated
+proofs. -/
 def instAddMonoidWithOne' [DivisionRing α] : AddMonoidWithOne α := inferInstance
 
 /-- A shortcut (non)instance for `Ring α` from `DivisionRing α` to shrink generated proofs. -/
@@ -332,7 +333,9 @@ def inferOfScientific (α : Q(Type u)) : MetaM Q(OfScientific $α) :=
     throwError "does not support scientific notation"
 
 /-- Helper function to synthesize a typed `LawfulOfScientific α` expression. -/
-def inferLawfulOfScientific {α : Q(Type u)} (_dα : Q(DivisionRing $α) := by with_reducible assumption) (_sα : Q(OfScientific $α) := by with_reducible assumption) : MetaM Q(LawfulOfScientific $α) :=
+def inferLawfulOfScientific {α : Q(Type u)}
+    (_dα : Q(DivisionRing $α) := by with_reducible assumption)
+    (_sα : Q(OfScientific $α) := by with_reducible assumption) : MetaM Q(LawfulOfScientific $α) :=
   return ← synthInstanceQ (q(LawfulOfScientific $α) : Q(Prop)) <|>
     throwError "does not support lawful scientific notation"
 
