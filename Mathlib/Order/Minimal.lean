@@ -157,7 +157,7 @@ theorem minimals_union : minimals r (s ∪ t) ⊆ minimals r s ∪ minimals r t 
   maximals_union
 #align minimals_union minimals_union
 
-theorem maximals_inter_subset : maximals r s ∩ t ⊆ maximals r (s ∩ t) := fun a ha =>
+theorem maximals_inter_subset : maximals r s ∩ t ⊆ maximals r (s ∩ t) := fun _a ha =>
   ⟨⟨ha.1.1, ha.2⟩, fun _b hb => ha.1.2 hb.1⟩
 #align maximals_inter_subset maximals_inter_subset
 
