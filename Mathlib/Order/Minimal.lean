@@ -9,7 +9,7 @@ Authors: Yaël Dillies
 ! if you have ported upstream changes.
 -/
 import Mathlib.Order.Antichain
-import Mathlib.Order.UpperLower
+-- import Mathlib.Order.UpperLower
 
 /-!
 # Minimal/maximal elements of a set
@@ -95,7 +95,7 @@ theorem eq_of_mem_minimals (ha : a ∈ minimals r s) (hb : b ∈ s) (h : r b a) 
 
 variable (r s)
 
-theorem maximals_antichain : IsAntichain r (maximals r s) := fun a ha b hb hab h =>
+theorem maximals_antichain : IsAntichain r (maximals r s) := fun _a ha _b hb hab h =>
   hab <| eq_of_mem_maximals ha hb.1 h
 #align maximals_antichain maximals_antichain
 
@@ -106,16 +106,24 @@ theorem minimals_antichain : IsAntichain r (minimals r s) :=
 
 end IsAntisymm
 
+-- porting note: new lemma
+theorem maximals_of_symm [IsSymm α r] : maximals r s = s :=
+  sep_eq_self_iff_mem_true.2 <| fun _ _ _ _ => symm
+
+-- porting note: new lemma
+theorem minimals_of_symm [IsSymm α r] : minimals r s = s :=
+  sep_eq_self_iff_mem_true.2 <| fun _ _ _ _ => symm
+
 theorem maximals_eq_minimals [IsSymm α r] : maximals r s = minimals r s := by
-  congr
-  ext (a b)
-  exact comm
+  rw [minimals_of_symm, maximals_of_symm]
 #align maximals_eq_minimals maximals_eq_minimals
 
 variable {r r₁ r₂ s t a}
 
-theorem Set.Subsingleton.maximals_eq (h : s.Subsingleton) : maximals r s = s :=
-  h.inductionOn (minimals_empty _) (maximals_singleton _)
+-- porting note: todo: use `h.induction_on`
+theorem Set.Subsingleton.maximals_eq (h : s.Subsingleton) : maximals r s = s := by
+  rcases h.eq_empty_or_singleton with (rfl | ⟨x, rfl⟩)
+  exacts [minimals_empty _, maximals_singleton _ _]
 #align set.subsingleton.maximals_eq Set.Subsingleton.maximals_eq
 
 theorem Set.Subsingleton.minimals_eq (h : s.Subsingleton) : minimals r s = s :=
@@ -150,15 +158,15 @@ theorem minimals_union : minimals r (s ∪ t) ⊆ minimals r s ∪ minimals r t 
 #align minimals_union minimals_union
 
 theorem maximals_inter_subset : maximals r s ∩ t ⊆ maximals r (s ∩ t) := fun a ha =>
-  ⟨⟨ha.1.1, ha.2⟩, fun b hb => ha.1.2 hb.1⟩
+  ⟨⟨ha.1.1, ha.2⟩, fun _b hb => ha.1.2 hb.1⟩
 #align maximals_inter_subset maximals_inter_subset
 
 theorem minimals_inter_subset : minimals r s ∩ t ⊆ minimals r (s ∩ t) :=
   maximals_inter_subset
 #align minimals_inter_subset minimals_inter_subset
 
-theorem inter_maximals_subset : s ∩ maximals r t ⊆ maximals r (s ∩ t) := fun a ha =>
-  ⟨⟨ha.1, ha.2.1⟩, fun b hb => ha.2.2 hb.2⟩
+theorem inter_maximals_subset : s ∩ maximals r t ⊆ maximals r (s ∩ t) := fun _a ha =>
+  ⟨⟨ha.1, ha.2.1⟩, fun _b hb => ha.2.2 hb.2⟩
 #align inter_maximals_subset inter_maximals_subset
 
 theorem inter_minimals_subset : s ∩ minimals r t ⊆ minimals r (s ∩ t) :=
@@ -183,7 +191,7 @@ theorem IsAntichain.minimals_eq (h : IsAntichain r s) : minimals r s = s :=
 
 @[simp]
 theorem maximals_idem : maximals r (maximals r s) = maximals r s :=
-  (maximals_subset _ _).antisymm fun a ha => ⟨ha, fun b hb => ha.2 hb.1⟩
+  (maximals_subset _ _).antisymm fun _a ha => ⟨ha, fun _b hb => ha.2 hb.1⟩
 #align maximals_idem maximals_idem
 
 @[simp]
@@ -212,32 +220,32 @@ theorem IsAntichain.max_minimals (ht : IsAntichain r t) (h : minimals r s ⊆ t)
 variable [PartialOrder α]
 
 theorem IsLeast.mem_minimals (h : IsLeast s a) : a ∈ minimals (· ≤ ·) s :=
-  ⟨h.1, fun b hb _ => h.2 hb⟩
+  ⟨h.1, fun _b hb _ => h.2 hb⟩
 #align is_least.mem_minimals IsLeast.mem_minimals
 
 theorem IsGreatest.mem_maximals (h : IsGreatest s a) : a ∈ maximals (· ≤ ·) s :=
-  ⟨h.1, fun b hb _ => h.2 hb⟩
+  ⟨h.1, fun _b hb _ => h.2 hb⟩
 #align is_greatest.mem_maximals IsGreatest.mem_maximals
 
 theorem IsLeast.minimals_eq (h : IsLeast s a) : minimals (· ≤ ·) s = {a} :=
-  eq_singleton_iff_unique_mem.2 ⟨h.mem_minimals, fun b hb => eq_of_mem_minimals hb h.1 <| h.2 hb.1⟩
+  eq_singleton_iff_unique_mem.2 ⟨h.mem_minimals, fun _b hb => eq_of_mem_minimals hb h.1 <| h.2 hb.1⟩
 #align is_least.minimals_eq IsLeast.minimals_eq
 
 theorem IsGreatest.maximals_eq (h : IsGreatest s a) : maximals (· ≤ ·) s = {a} :=
-  eq_singleton_iff_unique_mem.2 ⟨h.mem_maximals, fun b hb => eq_of_mem_maximals hb h.1 <| h.2 hb.1⟩
+  eq_singleton_iff_unique_mem.2 ⟨h.mem_maximals, fun _b hb => eq_of_mem_maximals hb h.1 <| h.2 hb.1⟩
 #align is_greatest.maximals_eq IsGreatest.maximals_eq
 
-theorem IsAntichain.minimals_upperClosure (hs : IsAntichain (· ≤ ·) s) :
-    minimals (· ≤ ·) (upperClosure s : Set α) = s :=
-  hs.max_minimals
-    (fun a ⟨⟨b, hb, hba⟩, h⟩ => by rwa [eq_of_mem_minimals ‹a ∈ _› (subset_upperClosure hb) hba])
-    fun a ha =>
-    ⟨a, ⟨subset_upperClosure ha, fun b ⟨c, hc, hcb⟩ hba => by rwa [hs.eq' ha hc (hcb.trans hba)]⟩,
-      le_rfl⟩
-#align is_antichain.minimals_upper_closure IsAntichain.minimals_upperClosure
+/- porting note: todo: restore 2 lemmas -/
+-- theorem IsAntichain.minimals_upperClosure (hs : IsAntichain (· ≤ ·) s) :
+--     minimals (· ≤ ·) (upperClosure s : Set α) = s :=
+--   hs.max_minimals
+--     (fun a ⟨⟨b, hb, hba⟩, h⟩ => by rwa [eq_of_mem_minimals ‹a ∈ _› (subset_upperClosure hb) hba])
+--     fun a ha =>
+--     ⟨a, ⟨subset_upperClosure ha, fun b ⟨c, hc, hcb⟩ hba => by rwa [hs.eq' ha hc (hcb.trans hba)]⟩,
+--       le_rfl⟩
+-- #align is_antichain.minimals_upper_closure IsAntichain.minimals_upperClosure
 
-theorem IsAntichain.maximals_lowerClosure (hs : IsAntichain (· ≤ ·) s) :
-    maximals (· ≤ ·) (lowerClosure s : Set α) = s :=
-  hs.toDual.minimals_upper_closure
-#align is_antichain.maximals_lower_closure IsAntichain.maximals_lowerClosure
-
+-- theorem IsAntichain.maximals_lowerClosure (hs : IsAntichain (· ≤ ·) s) :
+--     maximals (· ≤ ·) (lowerClosure s : Set α) = s :=
+--   hs.toDual.minimals_upper_closure
+-- #align is_antichain.maximals_lower_closure IsAntichain.maximals_lowerClosure
