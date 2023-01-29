@@ -1057,14 +1057,11 @@ theorem tendsto_subtype_rng {β : Type _} {p : α → Prop} {b : Filter β} {f :
 theorem continuous_subtype_nhds_cover {ι : Sort _} {f : α → β} {c : ι → α → Prop}
     (c_cover : ∀ x : α, ∃ i, { x | c i x } ∈ 𝓝 x)
     (f_cont : ∀ i, Continuous fun x : Subtype (c i) => f x) : Continuous f :=
-  continuous_iff_continuousAt.mpr fun x =>
-    let ⟨i, (c_sets : { x | c i x } ∈ 𝓝 x)⟩ := c_cover x
-    let x' : Subtype (c i) := ⟨x, mem_of_mem_nhds c_sets⟩
-    calc
-      map f (𝓝 x) = map f (map (↑) (𝓝 x')) :=
-        congr_arg (map f) (map_nhds_subtype_coe_eq_nhds _ c_sets).symm
-      _ = map (fun x : Subtype (c i) => f x) (𝓝 x') := rfl
-      _ ≤ 𝓝 (f x) := continuous_iff_continuousAt.mp (f_cont i) x'
+  continuous_iff_continuousAt.mpr fun x => by
+    rcases c_cover x with ⟨i, c_sets⟩
+    lift x to Subtype (c i) using mem_of_mem_nhds c_sets
+    refine' (inducing_subtype_val.continuousAt_iff' _).1 (f_cont i).continuousAt
+    rwa [Subtype.range_coe]
 #align continuous_subtype_nhds_cover continuous_subtype_nhds_cover
 
 /- porting note: todo: see https://github.com/leanprover-community/mathlib/pull/18321
