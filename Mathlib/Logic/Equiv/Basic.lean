@@ -1157,9 +1157,9 @@ def sigmaSubtypeEquivOfSubset (p : α → Type v) (q : α → Prop) (h : ∀ x, 
 `Σ y : {y // p y}, {x // f x = y}` is equivalent to `α`. -/
 def sigmaSubtypeFiberEquiv {α β : Type _} (f : α → β) (p : β → Prop) (h : ∀ x, p (f x)) :
     (Σ y : Subtype p, { x : α // f x = y }) ≃ α :=
+  show (y : Subtype p) × { x // f x = y } ≃ α from
   calc
-    _ ≃ Σy : β, { x : α // f x = y } :=
-          @sigmaSubtypeEquivOfSubset _ (fun y => { x : α // f x = y }) p (fun _ ⟨x, h'⟩ => h' ▸ h x)
+    _ ≃ Σy : β, { x : α // f x = y } := sigmaSubtypeEquivOfSubset _ p (fun _ ⟨x, h'⟩ => h' ▸ h x)
     _ ≃ α := sigmaFiberEquiv f
 #align equiv.sigma_subtype_fiber_equiv Equiv.sigmaSubtypeFiberEquiv
 
