@@ -63,7 +63,7 @@ because they are recognized as terms of `R` (at least when `R` is an `AddMonoidW
 instance [NatCast R] [Nat.AtLeastTwo n] : OfNat R n where
   ofNat := n.cast
 
-@[simp, norm_cast] theorem Nat.cast_ofNat [NatCast R] [Nat.AtLeastTwo n] :
+@[simp, norm_cast] theorem Nat.cast_ofNat {_ : NatCast R} [Nat.AtLeastTwo n] :
   (Nat.cast (OfNat.ofNat n) : R) = OfNat.ofNat n := rfl
 
 /-! ### Additive monoids with one -/
