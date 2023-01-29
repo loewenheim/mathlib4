@@ -217,7 +217,10 @@ classical ones, as these may cause instance mismatch errors later.
 /-- The Double Negation Theorem: `¬ ¬ P` is equivalent to `P`.
 The left-to-right direction, double negation elimination (DNE),
 is classically true but not constructively. -/
-@[simp] theorem not_not : ¬¬a ↔ a := Decidable.not_not
+add_decl_doc Classical.not_not
+
+export Classical (not_not)
+attribute [simp] not_not
 
 theorem of_not_not : ¬¬a → a := by_contra
 
