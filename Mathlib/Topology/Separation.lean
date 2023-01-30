@@ -1506,8 +1506,9 @@ theorem RegularSpace.ofExistsMemNhdsIsClosedSubset
 
 variable [RegularSpace α] {a : α} {s : Set α}
 
-theorem disjoint_nhdsSet_nhds : Disjoint (𝓝ˢ s) (𝓝 a) ↔ a ∉ closure s :=
-  Iff.mp ((regularSpace_TFAE α).out 0 2) ‹_› _ _
+theorem disjoint_nhdsSet_nhds : Disjoint (𝓝ˢ s) (𝓝 a) ↔ a ∉ closure s := by
+  have h := (regularSpace_TFAE α).out 0 2
+  exact h.mp ‹_› _ _
 #align disjoint_nhds_set_nhds disjoint_nhdsSet_nhds
 
 theorem disjoint_nhds_nhdsSet : Disjoint (𝓝 a) (𝓝ˢ s) ↔ a ∉ closure s :=
@@ -1515,8 +1516,9 @@ theorem disjoint_nhds_nhdsSet : Disjoint (𝓝 a) (𝓝ˢ s) ↔ a ∉ closure s
 #align disjoint_nhds_nhds_set disjoint_nhds_nhdsSet
 
 theorem exists_mem_nhds_isClosed_subset {a : α} {s : Set α} (h : s ∈ 𝓝 a) :
-    ∃ t ∈ 𝓝 a, IsClosed t ∧ t ⊆ s :=
-  Iff.mp ((regularSpace_TFAE α).out 0 3) ‹_› _ _ h
+    ∃ t ∈ 𝓝 a, IsClosed t ∧ t ⊆ s := by
+  have h' := (regularSpace_TFAE α).out 0 3
+  exact h'.mp ‹_› _ _ h
 #align exists_mem_nhds_is_closed_subset exists_mem_nhds_isClosed_subset
 
 theorem closed_nhds_basis (a : α) : (𝓝 a).HasBasis (fun s : Set α => s ∈ 𝓝 a ∧ IsClosed s) id :=
@@ -1524,7 +1526,7 @@ theorem closed_nhds_basis (a : α) : (𝓝 a).HasBasis (fun s : Set α => s ∈ 
 #align closed_nhds_basis closed_nhds_basis
 
 theorem lift'_nhds_closure (a : α) : (𝓝 a).lift' closure = 𝓝 a :=
-  (closed_nhds_basis a).lift'_closure_eq_self fun s hs => hs.2
+  (closed_nhds_basis a).lift'_closure_eq_self fun _ => And.right
 #align lift'_nhds_closure lift'_nhds_closure
 
 theorem Filter.HasBasis.nhds_closure {ι : Sort _} {a : α} {p : ι → Prop} {s : ι → Set α}
@@ -1557,7 +1559,7 @@ theorem disjoint_nhds_nhds_iff_not_specializes {a b : α} : Disjoint (𝓝 a) (�
 #align disjoint_nhds_nhds_iff_not_specializes disjoint_nhds_nhds_iff_not_specializes
 
 theorem specializes_comm {a b : α} : a ⤳ b ↔ b ⤳ a := by
-  simp only [← disjoint_nhds_nhds_iff_not_specializes.not_left, disjoint_comm]
+  simp only [← (disjoint_nhds_nhds_iff_not_specializes (α := α)).not_left, disjoint_comm]
 #align specializes_comm specializes_comm
 
 alias specializes_comm ↔ Specializes.symm _
@@ -1583,48 +1585,45 @@ protected theorem Inducing.regularSpace [TopologicalSpace β] {f : β → α} (h
     fun b s hs => by exact hs.2.preimage hf.continuous
 #align inducing.regular_space Inducing.regularSpace
 
-theorem regularSpaceInduced (f : β → α) : @RegularSpace β (induced f ‹_›) :=
-  letI := induced f ‹_›
+theorem regularSpaceInduced (f : β → α) : @RegularSpace β (.induced f ‹_›) :=
+  let _ := TopologicalSpace.induced f ‹_›
   Inducing.regularSpace ⟨rfl⟩
 #align regular_space_induced regularSpaceInduced
 
 theorem regularSpaceInf {X} {T : Set (TopologicalSpace X)} (h : ∀ t ∈ T, @RegularSpace X t) :
     @RegularSpace X (infₛ T) := by
   let _ := infₛ T
-  have :
-    ∀ a,
-      (𝓝 a).HasBasis
-        (fun If : ΣI : Set T, I → Set X =>
-          If.1.Finite ∧ ∀ i : If.1, If.2 i ∈ @nhds X i a ∧ @IsClosed X i (If.2 i))
-        fun If => ⋂ i : If.1, If.snd i :=
-    by
+  have : ∀ a, (𝓝 a).HasBasis
+      (fun If : ΣI : Set T, I → Set X =>
+        If.1.Finite ∧ ∀ i : If.1, If.2 i ∈ @nhds X i a ∧ @IsClosed X i (If.2 i))
+      fun If => ⋂ i : If.1, If.snd i := by
     intro a
     rw [nhds_infₛ, ← infᵢ_subtype'']
-    exact has_basis_infi fun t : T => @closed_nhds_basis X t (h t t.2) a
+    exact hasBasis_infᵢ fun t : T => @closed_nhds_basis X t (h t t.2) a
   refine' RegularSpace.ofBasis this fun a If hIf => isClosed_interᵢ fun i => _
   exact (hIf.2 i).2.mono (infₛ_le (i : T).2)
 #align regular_space_Inf regularSpaceInf
 
-theorem regularSpaceInfi {ι X} {t : ι → TopologicalSpace X} (h : ∀ i, @RegularSpace X (t i)) :
+theorem regularSpaceInfᵢ {ι X} {t : ι → TopologicalSpace X} (h : ∀ i, @RegularSpace X (t i)) :
     @RegularSpace X (infᵢ t) :=
   regularSpaceInf <| forall_range_iff.mpr h
-#align regular_space_infi regularSpaceInfi
+#align regular_space_infi regularSpaceInfᵢ
 
 theorem RegularSpace.inf {X} {t₁ t₂ : TopologicalSpace X} (h₁ : @RegularSpace X t₁)
     (h₂ : @RegularSpace X t₂) : @RegularSpace X (t₁ ⊓ t₂) := by
   rw [inf_eq_infᵢ]
-  exact regularSpaceInfi (Bool.forall_bool.2 ⟨h₂, h₁⟩)
+  exact regularSpaceInfᵢ (Bool.forall_bool.2 ⟨h₂, h₁⟩)
 #align regular_space.inf RegularSpace.inf
 
 instance {p : α → Prop} : RegularSpace (Subtype p) :=
-  embedding_subtype_coe.to_inducing.RegularSpace
+  embedding_subtype_val.toInducing.regularSpace
 
 instance [TopologicalSpace β] [RegularSpace β] : RegularSpace (α × β) :=
-  (regularSpaceInduced Prod.fst).inf (regularSpaceInduced Prod.snd)
+  (regularSpaceInduced (@Prod.fst α β)).inf (regularSpaceInduced (@Prod.snd α β))
 
 instance {ι : Type _} {π : ι → Type _} [∀ i, TopologicalSpace (π i)] [∀ i, RegularSpace (π i)] :
     RegularSpace (∀ i, π i) :=
-  regularSpaceInfi fun i => regularSpaceInduced _
+  regularSpaceInfᵢ fun _ => regularSpaceInduced _
 
 end RegularSpace
 
