@@ -1465,18 +1465,6 @@ end CompactExhaustion
 
 section Clopen
 
--- porting note: todo: redefine as `IsClosed s ∧ IsOpen s`
-/-- A set is clopen if it is both open and closed. -/
-def IsClopen (s : Set α) : Prop :=
-  IsOpen s ∧ IsClosed s
-#align is_clopen IsClopen
-
-protected theorem IsClopen.isOpen (hs : IsClopen s) : IsOpen s := hs.1
-#align is_clopen.is_open IsClopen.isOpen
-
-protected theorem IsClopen.isClosed (hs : IsClopen s) : IsClosed s := hs.2
-#align is_clopen.is_closed IsClopen.isClosed
-
 theorem isClopen_iff_frontier_eq_empty {s : Set α} : IsClopen s ↔ frontier s = ∅ := by
   rw [IsClopen, ← closure_eq_iff_isClosed, ← interior_eq_iff_isOpen, frontier, diff_eq_empty]
   refine' ⟨fun h => (h.2.trans h.1.symm).subset, fun h => _⟩
@@ -1596,13 +1584,7 @@ variable {X : Type _} [TopologicalSpace X]
 
 theorem continuous_boolIndicator_iff_clopen (U : Set X) :
     Continuous U.boolIndicator ↔ IsClopen U := by
-  constructor
-  · intro hc
-    rw [← U.preimage_boolIndicator_true]
-    exact ⟨(isOpen_discrete _).preimage hc, (isClosed_discrete _).preimage hc⟩
-  · refine' fun hU => ⟨fun s _ => _⟩
-    rcases U.preimage_boolIndicator s with (h | h | h | h) <;> rw [h]
-    exacts[isOpen_univ, hU.1, hU.2.isOpen_compl, isOpen_empty]
+  rw [continuous_to_bool, preimage_boolIndicator_true]
 #align continuous_bool_indicator_iff_clopen continuous_boolIndicator_iff_clopen
 
 theorem continuousOn_boolIndicator_iff_clopen (s U : Set X) :
