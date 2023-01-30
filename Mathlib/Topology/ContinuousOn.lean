@@ -1008,8 +1008,8 @@ theorem ContinuousOn.preimage_interior_subset_interior_preimage {f : α → β} 
       interior_maximal (inter_subset_inter (Subset.refl _) (preimage_mono interior_subset))
         (hf.preimage_open_of_open hs isOpen_interior)
     _ = s ∩ interior (f ⁻¹' t) := by rw [interior_inter, hs.interior_eq]
-    
-#align continuous_on.preimage_interior_subset_interior_preimage ContinuousOn.preimage_interior_subset_interior_preimage
+#align continuous_on.preimage_interior_subset_interior_preimage
+  ContinuousOn.preimage_interior_subset_interior_preimage
 
 theorem continuousOn_of_locally_continuousOn {f : α → β} {s : Set α}
     (h : ∀ x ∈ s, ∃ t, IsOpen t ∧ x ∈ t ∧ ContinuousOn f (s ∩ t)) : ContinuousOn f s := by
@@ -1098,7 +1098,8 @@ theorem ContinuousOn.if' {s : Set α} {p : α → Prop} {f g : α → β} [∀ a
     cases' hx with hx hx
     · apply ContinuousWithinAt.union
       · exact (hf x hx).congr (fun y hy => if_pos hy.2) (if_pos hx.2)
-      · have : x ∉ closure ({ a | p a }ᶜ) := fun h => hx' ⟨subset_closure hx.2, by rwa [closure_compl] at h⟩
+      · have : x ∉ closure ({ a | p a }ᶜ) := fun h => hx' ⟨subset_closure hx.2, by
+          rwa [closure_compl] at h⟩
         exact continuousWithinAt_of_not_mem_closure fun h =>
           this (closure_inter_subset_inter_closure _ _ h).2
     · apply ContinuousWithinAt.union
@@ -1214,7 +1215,8 @@ theorem ite_inter_closure_compl_eq_of_inter_frontier_eq {s s' t : Set α}
     (ht : s ∩ frontier t = s' ∩ frontier t) : t.ite s s' ∩ closure (tᶜ) = s' ∩ closure (tᶜ) := by
   rw [← ite_compl, ite_inter_closure_eq_of_inter_frontier_eq]
   rwa [frontier_compl, eq_comm]
-#align ite_inter_closure_compl_eq_of_inter_frontier_eq ite_inter_closure_compl_eq_of_inter_frontier_eq
+#align ite_inter_closure_compl_eq_of_inter_frontier_eq
+  ite_inter_closure_compl_eq_of_inter_frontier_eq
 
 theorem continuousOn_piecewise_ite' {s s' t : Set α} {f f' : α → β} [∀ x, Decidable (x ∈ t)]
     (h : ContinuousOn f (s ∩ closure t)) (h' : ContinuousOn f' (s' ∩ closure (tᶜ)))
