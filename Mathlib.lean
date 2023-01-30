@@ -800,6 +800,7 @@ import Mathlib.RingTheory.NonZeroDivisors
 import Mathlib.RingTheory.OreLocalization.OreSet
 import Mathlib.RingTheory.Prime
 import Mathlib.RingTheory.RingInvo
+import Mathlib.RingTheory.Subring.Basic
 import Mathlib.RingTheory.Subsemiring.Basic
 import Mathlib.SetTheory.Cardinal.SchroederBernstein
 import Mathlib.Tactic.Abel
