@@ -314,23 +314,6 @@ def inferCharZeroOfDivisionRing? {α : Q(Type u)}
     (_i : Q(DivisionRing $α) := by with_reducible assumption) : MetaM (Option Q(CharZero $α)) :=
   return (← trySynthInstanceQ (q(CharZero $α) : Q(Prop))).toOption
 
---!! TODO: Move to appropriate place
-instance DivisionRing.instOfScientific [DivisionRing α] : OfScientific α where
-  ofScientific (m : ℕ) (b : Bool) (d : ℕ) := Rat.ofScientific m b d
-
-/-- A class which states that an `OfScientific α` instance is propositionally equal to the cast of
-the canonical `OfScientific Rat` instance, assuming we have `RatCast α`. -/
-class LawfulOfScientific (α) [OfScientific α] [RatCast α] : Prop where
-  /-- However `ofScientific` is defined, it's pointwise equal to the cast of `Rat.ofScientific`. -/
-  ofScientific_eq (m : ℕ) (b : Bool) (d : ℕ) :
-      OfScientific.ofScientific m b d = (Rat.ofScientific m b d : α)
-
-instance : LawfulOfScientific Rat where
-  ofScientific_eq _ _ _ := rfl
-
-instance [DivisionRing α] : LawfulOfScientific α  where
-  ofScientific_eq _ _ _ := rfl
-
 /-- Helper function to synthesize a typed `OfScientific α` expression. -/
 def inferOfScientific (α : Q(Type u)) : MetaM Q(OfScientific $α) :=
   return ← synthInstanceQ (q(OfScientific $α) : Q(Type u)) <|>

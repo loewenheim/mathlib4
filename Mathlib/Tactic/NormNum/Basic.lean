@@ -485,33 +485,33 @@ such that `norm_num` successfully recognises `a`. -/
     let ⟨qa, na, da, pa⟩ ← ra.toRat'
     let qb := qa⁻¹
     if qa > 0 then
-      if let .some _i := _i then
+      if let some _i := _i then
         have lit : Q(ℕ) := na.appArg!
         have lit2 : Q(ℕ) := mkRawNatLit (lit.natLit! - 1)
-        let pa : Q(IsRat «$a» (Int.ofNat (Nat.succ $lit2)) $da) := pa
+        let pa : Q(IsRat $a (Int.ofNat (Nat.succ $lit2)) $da) := pa
         return (.isRat' dα qb q(.ofNat $da) lit
           (q(isRat_inv_pos (α := $α) $pa) : Expr) : Result q($a⁻¹))
       else
         guard (qa = 1)
-        let .isNat inst _z
+        let .isNat inst n
           (pa : Q(@IsNat _ AddGroupWithOne.toAddMonoidWithOne $a (nat_lit 1))) := ra | failure
-        return (.isNat inst _z (q(isRat_inv_one $pa) : Expr) : Result q($a⁻¹))
+        return (.isNat inst n (q(isRat_inv_one $pa) : Expr) : Result q($a⁻¹))
     else if qa < 0 then
-      if let .some _i := _i then
+      if let some _i := _i then
         have lit : Q(ℕ) := na.appArg!
         have lit2 : Q(ℕ) := mkRawNatLit (lit.natLit! - 1)
-        let pa : Q(IsRat «$a» (Int.negOfNat (Nat.succ $lit2)) $da) := pa
+        let pa : Q(IsRat $a (Int.negOfNat (Nat.succ $lit2)) $da) := pa
         return (.isRat' dα qb q(.negOfNat $da) lit
           (q(isRat_inv_neg (α := $α) $pa) : Expr) : Result q($a⁻¹))
       else
         guard (qa = -1)
-        let .isNegNat inst _z
+        let .isNegNat inst n
           (pa : Q(@IsInt _ DivisionRing.toRing $a (.negOfNat 1))) := ra | failure
-        return (.isNegNat inst _z (q(isRat_inv_neg_one $pa) : Expr) : Result q($a⁻¹))
+        return (.isNegNat inst n (q(isRat_inv_neg_one $pa) : Expr) : Result q($a⁻¹))
     else
-      let .isNat inst _z (pa : Q(@IsNat _ AddGroupWithOne.toAddMonoidWithOne $a (nat_lit 0))) := ra
+      let .isNat inst n (pa : Q(@IsNat _ AddGroupWithOne.toAddMonoidWithOne $a (nat_lit 0))) := ra
         | failure
-      return (.isNat inst _z (q(isRat_inv_zero $pa) : Expr) : Result q($a⁻¹))
+      return (.isNat inst n (q(isRat_inv_zero $pa) : Expr) : Result q($a⁻¹))
   core
 
 theorem isRat_div [DivisionRing α] : {a b : α} → {cn : ℤ} → {cd : ℕ} → IsRat (a * b⁻¹) cn cd →
@@ -534,22 +534,9 @@ such that `norm_num` successfully recognises both `a` and `b`. -/
 # Constructor-like operations
 -/
 
---TODO : move
-theorem mkRat_eq_div {n : ℤ} {d : ℕ} : mkRat n d = (n / d : ℚ) := by
-  simp [mkRat]
-  by_cases d = 0
-  · simp [h]
-  · simp [h, HDiv.hDiv, Div.div]
-    unfold Rat.inv
-    have h₁ : ¬ (d : ℤ) < 0 := by simp
-    have h₂ : 0 < d := Nat.pos_iff_ne_zero.2 h
-    have mkRat_one {n : ℤ} : mkRat n 1 = n := by simp [Rat.mkRat_eq, Rat.divInt_one]
-    simp [h, h₁, h₂, ←Rat.normalize_eq_mk', Rat.normalize_eq_mkRat, ← mkRat_one,
-      Rat.mkRat_mul_mkRat]
-
 theorem isRat_mkRat : {a na n : ℤ} → {b nb d : ℕ} → IsInt a na → IsNat b nb →
     IsRat (na / nb : ℚ) n d → IsRat (mkRat a b) n d
-  | _, _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, ⟨_, h⟩ => by rw [mkRat_eq_div]; exact ⟨_, h⟩
+  | _, _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, ⟨_, h⟩ => by rw [Rat.mkRat_eq_div]; exact ⟨_, h⟩
 
 /-- The `norm_num` extension which identifies expressions of the form `mkRat a b`,
 such that `norm_num` successfully recognises both `a` and `b`, and returns `a / b`. -/
@@ -570,14 +557,10 @@ such that `norm_num` successfully recognises both `a` and `b`, and returns `a / 
 theorem isRat_ofScientific_of_true [DivisionRing α] [OfScientific α] [LawfulOfScientific α] :
     {m e : ℕ} → {n : ℤ} → {d : ℕ} → IsRat (mkRat m (10 ^ e) : α) n d →
     IsRat (OfScientific.ofScientific (α := α) m true e) n d
-  | _, _, _, _, ⟨_, eq⟩ =>
-    -- have := invertibleOfNonzero (α := α) <| Nat.cast_ne_zero.2 <| q.den_nz
-    ⟨_,
-    by
-      simp only [LawfulOfScientific.ofScientific_eq, if_true, Rat.ofScientific,
-        Rat.normalize_eq_mkRat]
-      exact eq
-      ⟩
+  | _, _, _, _, ⟨_, eq⟩ => ⟨_, by
+    simp only [LawfulOfScientific.ofScientific_eq, if_true, Rat.ofScientific,
+      Rat.normalize_eq_mkRat]
+    exact eq⟩
 
 theorem isNat_ofScientific_of_false [dα : DivisionRing α] [OfScientific α] [LawfulOfScientific α] :
     {m e nm ne n : ℕ} → IsNat m nm → IsNat e ne → n = Nat.mul nm ((10 : ℕ) ^ ne) →
@@ -763,7 +746,7 @@ such that `norm_num` successfully recognises both `a` and `b`. -/
     if za = zb then
       let pb : Q(IsInt $b $na) := pb
       return (.isTrue q(isInt_eq_true $pa $pb) : Result q($a = $b))
-    else if let .some _i ← inferCharZeroOfRing? rα then
+    else if let some _i ← inferCharZeroOfRing? rα then
       let r : Q(decide ($na = $nb) = false) := (q(Eq.refl false) : Expr)
       return (.isFalse q(isInt_eq_false $pa $pb $r) : Result q($a = $b))
     else
@@ -773,7 +756,7 @@ such that `norm_num` successfully recognises both `a` and `b`. -/
     if qa = qb then
       let pb : Q(IsRat $b $na $da) := pb
       return (.isTrue q(isRat_eq_true $pa $pb) : Result q($a = $b))
-    else if let .some _i ← inferCharZeroOfDivisionRing? dα then
+    else if let some _i ← inferCharZeroOfDivisionRing? dα then
       let r : Q(decide (Int.mul $na (.ofNat $db) = Int.mul $nb (.ofNat $da)) = false) :=
         (q(Eq.refl false) : Expr)
       return (.isFalse q(isRat_eq_false $pa $pb $r) : Result q($a = $b))
@@ -799,7 +782,7 @@ such that `norm_num` successfully recognises both `a` and `b`. -/
     if na.natLit!.beq nb.natLit! then
       let r : Q(Nat.beq $na $nb = true) := (q(Eq.refl true) : Expr)
       return (.isTrue q(isNat_eq_true $pa $pb $r) : Result q($a = $b))
-    else if let .some _i ← inferCharZeroOfAddMonoidWithOne? mα then
+    else if let some _i ← inferCharZeroOfAddMonoidWithOne? mα then
       let r : Q(Nat.beq $na $nb = false) := (q(Eq.refl false) : Expr)
       return (.isFalse q(isNat_eq_false $pa $pb $r) : Result q($a = $b))
     else
