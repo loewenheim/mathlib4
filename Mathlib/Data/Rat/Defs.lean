@@ -554,7 +554,7 @@ theorem mkRat_eq_div {n : ℤ} {d : ℕ} : mkRat n d = n / d := by
   simp [mkRat]
   by_cases d = 0
   · simp [h]
-  · simp [h, HDiv.hDiv, Div.div]
+  · simp [h, HDiv.hDiv, Rat.div, Div.div]
     unfold Rat.inv
     have h₁ : 0 < d := Nat.pos_iff_ne_zero.2 h
     have h₂ : ¬ (d : ℤ) < 0 := by simp
