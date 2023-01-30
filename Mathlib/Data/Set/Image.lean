@@ -928,7 +928,7 @@ theorem image_preimage_inl_union_image_preimage_inr (s : Set (Sum α β)) :
 
 @[simp]
 theorem range_quot_mk (r : α → α → Prop) : range (Quot.mk r) = univ :=
-  (surjective_quot_mk r).range_eq 
+  (surjective_quot_mk r).range_eq
 #align set.range_quot_mk Set.range_quot_mk
 
 @[simp]
