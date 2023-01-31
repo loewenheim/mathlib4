@@ -8,8 +8,8 @@ Authors: Eric Wieser
 ! Please do not edit these lines, except to modify the commit id
 ! if you have ported upstream changes.
 -/
-import Mathbin.Algebra.GradedMonoid
-import Mathbin.Algebra.DirectSum.Basic
+import Mathlib.Algebra.GradedMonoid
+import Mathlib.Algebra.DirectSum.Basic
 
 /-!
 # Additively-graded multiplicative structures on `⨁ i, A i`
@@ -190,8 +190,7 @@ instance : NonUnitalNonAssocSemiring (⨁ i, A i) :=
 variable {A}
 
 theorem mulHom_of_of {i j} (a : A i) (b : A j) :
-    mulHom A (of _ i a) (of _ j b) = of _ (i + j) (GradedMonoid.GMul.mul a b) :=
-  by
+    mulHom A (of _ i a) (of _ j b) = of _ (i + j) (GradedMonoid.GMul.mul a b) := by
   unfold MulHom
   rw [to_add_monoid_of, flip_apply, to_add_monoid_of, flip_apply, coe_comp, Function.comp_apply,
     comp_hom_apply_apply, coe_comp, Function.comp_apply, gmul_hom_apply_apply]
@@ -210,8 +209,7 @@ variable [∀ i, AddCommMonoid (A i)] [AddMonoid ι] [Gsemiring A]
 
 open AddMonoidHom (flipHom coe_comp comp_hom_apply_apply flip_apply flip_hom_apply)
 
-private theorem one_mul (x : ⨁ i, A i) : 1 * x = x :=
-  by
+private theorem one_mul (x : ⨁ i, A i) : 1 * x = x := by
   suffices mulHom A 1 = AddMonoidHom.id (⨁ i, A i) from AddMonoidHom.congr_fun this x
   apply add_hom_ext; intro i xi
   unfold One.one
@@ -219,8 +217,7 @@ private theorem one_mul (x : ⨁ i, A i) : 1 * x = x :=
   exact of_eq_of_graded_monoid_eq (one_mul <| GradedMonoid.mk i xi)
 #align direct_sum.one_mul direct_sum.one_mul
 
-private theorem mul_one (x : ⨁ i, A i) : x * 1 = x :=
-  by
+private theorem mul_one (x : ⨁ i, A i) : x * 1 = x := by
   suffices (mulHom A).flip 1 = AddMonoidHom.id (⨁ i, A i) from AddMonoidHom.congr_fun this x
   apply add_hom_ext; intro i xi
   unfold One.one
@@ -228,8 +225,7 @@ private theorem mul_one (x : ⨁ i, A i) : x * 1 = x :=
   exact of_eq_of_graded_monoid_eq (mul_one <| GradedMonoid.mk i xi)
 #align direct_sum.mul_one direct_sum.mul_one
 
-private theorem mul_assoc (a b c : ⨁ i, A i) : a * b * c = a * (b * c) :=
-  by
+private theorem mul_assoc (a b c : ⨁ i, A i) : a * b * c = a * (b * c) := by
   suffices
     (-- `λ a b c, a * b * c` as a bundled hom
               mulHom
@@ -265,8 +261,7 @@ instance semiring : Semiring (⨁ i, A i) :=
 #align direct_sum.semiring DirectSum.semiring
 
 theorem of_pow {i} (a : A i) (n : ℕ) :
-    of _ i a ^ n = of _ (n • i) (GradedMonoid.GMonoid.gnpow _ a) :=
-  by
+    of _ i a ^ n = of _ (n • i) (GradedMonoid.GMonoid.gnpow _ a) := by
   induction' n with n
   · exact of_eq_of_graded_monoid_eq (pow_zero <| GradedMonoid.mk _ a).symm
   · rw [pow_succ, n_ih, of_mul_of]
@@ -274,8 +269,7 @@ theorem of_pow {i} (a : A i) (n : ℕ) :
 #align direct_sum.of_pow DirectSum.of_pow
 
 theorem of_list_dProd {α} (l : List α) (fι : α → ι) (fA : ∀ a, A (fι a)) :
-    of A _ (l.dprod fι fA) = (l.map fun a => of A (fι a) (fA a)).Prod :=
-  by
+    of A _ (l.dprod fι fA) = (l.map fun a => of A (fι a) (fA a)).Prod := by
   induction l
   · simp only [List.map_nil, List.prod_nil, List.dProd_nil]
     rfl
@@ -313,8 +307,7 @@ section CommSemiring
 
 variable [∀ i, AddCommMonoid (A i)] [AddCommMonoid ι] [GcommSemiring A]
 
-private theorem mul_comm (a b : ⨁ i, A i) : a * b = b * a :=
-  by
+private theorem mul_comm (a b : ⨁ i, A i) : a * b = b * a := by
   suffices mulHom A = (mulHom A).flip from AddMonoidHom.congr_fun (AddMonoidHom.congr_fun this a) b
   apply add_hom_ext; intro ai ax; apply add_hom_ext; intro bi bx
   rw [AddMonoidHom.flip_apply, mul_hom_of_of, mul_hom_of_of]
@@ -426,8 +419,7 @@ instance GradeZero.nonUnitalNonAssocSemiring : NonUnitalNonAssocSemiring (A 0) :
     (of A 0).map_add (of_zero_mul A) fun x n => Dfinsupp.single_smul n x
 #align direct_sum.grade_zero.non_unital_non_assoc_semiring DirectSum.GradeZero.nonUnitalNonAssocSemiring
 
-instance GradeZero.smulWithZero (i : ι) : SMulWithZero (A 0) (A i) :=
-  by
+instance GradeZero.smulWithZero (i : ι) : SMulWithZero (A 0) (A i) := by
   letI := SMulWithZero.compHom (⨁ i, A i) (of A 0).toZeroHom
   refine' dfinsupp.single_injective.smul_with_zero (of A i).toZeroHom (of_zero_smul A)
 #align direct_sum.grade_zero.smul_with_zero DirectSum.GradeZero.smulWithZero
