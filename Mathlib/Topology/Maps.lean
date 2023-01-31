@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Johannes Hölzl, Mario Carneiro, Patrick Massot
 
 ! This file was ported from Lean 3 source module topology.maps
-! leanprover-community/mathlib commit f7fc89d5d5ff1db2d1242c7bb0e9062ce47ef47c
+! leanprover-community/mathlib commit bcfa726826abd57587355b4b5b7e78ad6527b7e4
 ! Please do not edit these lines, except to modify the commit id
 ! if you have ported upstream changes.
 -/
@@ -127,8 +127,8 @@ theorem Inducing.tendsto_nhds_iff {ι : Type _} {f : ι → β} {g : β → γ} 
 #align inducing.tendsto_nhds_iff Inducing.tendsto_nhds_iff
 
 theorem Inducing.continuousAt_iff {f : α → β} {g : β → γ} (hg : Inducing g) {x : α} :
-    ContinuousAt f x ↔ ContinuousAt (g ∘ f) x := by
-  simp_rw [ContinuousAt, Inducing.tendsto_nhds_iff hg, comp]
+    ContinuousAt f x ↔ ContinuousAt (g ∘ f) x :=
+  hg.tendsto_nhds_iff
 #align inducing.continuous_at_iff Inducing.continuousAt_iff
 
 theorem Inducing.continuous_iff {f : α → β} {g : β → γ} (hg : Inducing g) :
@@ -254,6 +254,15 @@ theorem Embedding.closure_eq_preimage_closure_image {e : α → β} (he : Embedd
     closure s = e ⁻¹' closure (e '' s) :=
   he.1.closure_eq_preimage_closure_image s
 #align embedding.closure_eq_preimage_closure_image Embedding.closure_eq_preimage_closure_image
+
+/-- The topology induced under an inclusion `f : X → Y` from the discrete topological space `Y`
+is the discrete topology on `X`. -/
+theorem Embedding.discreteTopology {X Y : Type _} [TopologicalSpace X] [tY : TopologicalSpace Y]
+    [DiscreteTopology Y] {f : X → Y} (hf : Embedding f) : DiscreteTopology X :=
+  discreteTopology_iff_nhds.2 fun x => by
+    rw [hf.nhds_eq_comap, nhds_discrete, comap_pure, ← image_singleton, hf.inj.preimage_image,
+      principal_singleton]
+#align embedding.discrete_topology Embedding.discreteTopology
 
 end Embedding
 
@@ -394,43 +403,37 @@ theorem to_quotientMap {f : α → β} (open_map : IsOpenMap f) (cont : Continuo
 theorem interior_preimage_subset_preimage_interior (hf : IsOpenMap f) {s : Set β} :
     interior (f ⁻¹' s) ⊆ f ⁻¹' interior s :=
   hf.mapsTo_interior (mapsTo_preimage _ _)
-#align is_open_map.interior_preimage_subset_preimage_interior
-  IsOpenMap.interior_preimage_subset_preimage_interior
+#align is_open_map.interior_preimage_subset_preimage_interior IsOpenMap.interior_preimage_subset_preimage_interior
 
 theorem preimage_interior_eq_interior_preimage (hf₁ : IsOpenMap f) (hf₂ : Continuous f)
     (s : Set β) : f ⁻¹' interior s = interior (f ⁻¹' s) :=
   Subset.antisymm (preimage_interior_subset_interior_preimage hf₂)
     (interior_preimage_subset_preimage_interior hf₁)
-#align is_open_map.preimage_interior_eq_interior_preimage
-  IsOpenMap.preimage_interior_eq_interior_preimage
+#align is_open_map.preimage_interior_eq_interior_preimage IsOpenMap.preimage_interior_eq_interior_preimage
 
 theorem preimage_closure_subset_closure_preimage (hf : IsOpenMap f) {s : Set β} :
     f ⁻¹' closure s ⊆ closure (f ⁻¹' s) := by
   rw [← compl_subset_compl]
   simp only [← interior_compl, ← preimage_compl, hf.interior_preimage_subset_preimage_interior]
-#align is_open_map.preimage_closure_subset_closure_preimage
-  IsOpenMap.preimage_closure_subset_closure_preimage
+#align is_open_map.preimage_closure_subset_closure_preimage IsOpenMap.preimage_closure_subset_closure_preimage
 
 theorem preimage_closure_eq_closure_preimage (hf : IsOpenMap f) (hfc : Continuous f) (s : Set β) :
     f ⁻¹' closure s = closure (f ⁻¹' s) :=
   hf.preimage_closure_subset_closure_preimage.antisymm (hfc.closure_preimage_subset s)
-#align is_open_map.preimage_closure_eq_closure_preimage
-  IsOpenMap.preimage_closure_eq_closure_preimage
+#align is_open_map.preimage_closure_eq_closure_preimage IsOpenMap.preimage_closure_eq_closure_preimage
 
 theorem preimage_frontier_subset_frontier_preimage (hf : IsOpenMap f) {s : Set β} :
     f ⁻¹' frontier s ⊆ frontier (f ⁻¹' s) := by
   simpa only [frontier_eq_closure_inter_closure, preimage_inter] using
     inter_subset_inter hf.preimage_closure_subset_closure_preimage
       hf.preimage_closure_subset_closure_preimage
-#align is_open_map.preimage_frontier_subset_frontier_preimage
-  IsOpenMap.preimage_frontier_subset_frontier_preimage
+#align is_open_map.preimage_frontier_subset_frontier_preimage IsOpenMap.preimage_frontier_subset_frontier_preimage
 
 theorem preimage_frontier_eq_frontier_preimage (hf : IsOpenMap f) (hfc : Continuous f) (s : Set β) :
     f ⁻¹' frontier s = frontier (f ⁻¹' s) := by
   simp only [frontier_eq_closure_inter_closure, preimage_inter, preimage_compl,
     hf.preimage_closure_eq_closure_preimage hfc]
-#align is_open_map.preimage_frontier_eq_frontier_preimage
-  IsOpenMap.preimage_frontier_eq_frontier_preimage
+#align is_open_map.preimage_frontier_eq_frontier_preimage IsOpenMap.preimage_frontier_eq_frontier_preimage
 
 end IsOpenMap
 
@@ -665,8 +668,7 @@ theorem closedEmbedding_of_continuous_injective_closed (h₁ : Continuous f) (h�
   refine h₁.le_induced.antisymm fun s hs => ?_
   refine ⟨(f '' sᶜ)ᶜ, (h₃ _ hs.isClosed_compl).isOpen_compl, ?_⟩
   rw [preimage_compl, preimage_image_eq _ h₂, compl_compl]
-#align closed_embedding_of_continuous_injective_closed
-  closedEmbedding_of_continuous_injective_closed
+#align closed_embedding_of_continuous_injective_closed closedEmbedding_of_continuous_injective_closed
 
 theorem closedEmbedding_id : ClosedEmbedding (@id α) :=
   ⟨embedding_id, IsClosedMap.id.closed_range⟩
