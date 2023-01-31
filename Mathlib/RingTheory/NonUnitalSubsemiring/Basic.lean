@@ -39,7 +39,7 @@ class NonUnitalSubsemiringClass (S : Type _) (R : Type u) [NonUnitalNonAssocSemi
 
 -- See note [lower instance priority]
 instance (priority := 100) NonUnitalSubsemiringClass.mulMemClass (S : Type _)
-    (R : outParam <| Type u) [NonUnitalNonAssocSemiring R] [SetLike S R]
+    (R : Type u) [NonUnitalNonAssocSemiring R] [SetLike S R]
     [h : NonUnitalSubsemiringClass S R] : MulMemClass S R :=
   { h with }
 #align non_unital_subsemiring_class.mul_mem_class NonUnitalSubsemiringClass.mulMemClass
