@@ -269,6 +269,7 @@ import Mathlib.Data.Countable.Basic
 import Mathlib.Data.Countable.Defs
 import Mathlib.Data.Countable.Small
 import Mathlib.Data.DList.Basic
+import Mathlib.Data.DList.Instances
 import Mathlib.Data.Dfinsupp.Basic
 import Mathlib.Data.Dfinsupp.NeLocus
 import Mathlib.Data.ENat.Basic
@@ -418,6 +419,7 @@ import Mathlib.Data.Multiset.Bind
 import Mathlib.Data.Multiset.Dedup
 import Mathlib.Data.Multiset.FinsetOps
 import Mathlib.Data.Multiset.Fold
+import Mathlib.Data.Multiset.Functor
 import Mathlib.Data.Multiset.Lattice
 import Mathlib.Data.Multiset.NatAntidiagonal
 import Mathlib.Data.Multiset.Nodup
@@ -554,6 +556,7 @@ import Mathlib.Data.Setoid.Basic
 import Mathlib.Data.Sigma.Basic
 import Mathlib.Data.Sigma.Lex
 import Mathlib.Data.Sigma.Order
+import Mathlib.Data.Sign
 import Mathlib.Data.Stream.Defs
 import Mathlib.Data.Stream.Init
 import Mathlib.Data.String.Defs
@@ -574,6 +577,7 @@ import Mathlib.Data.Vector.Basic
 import Mathlib.Data.Vector.Mem
 import Mathlib.Data.Vector.Zip
 import Mathlib.Data.W.Basic
+import Mathlib.Data.W.Constructions
 import Mathlib.Data.ZMod.Defs
 import Mathlib.Deprecated.Group
 import Mathlib.Deprecated.Ring
@@ -632,6 +636,7 @@ import Mathlib.Init.Algebra.Functions
 import Mathlib.Init.Algebra.Order
 import Mathlib.Init.Align
 import Mathlib.Init.CcLemmas
+import Mathlib.Init.Classes.Order
 import Mathlib.Init.Classical
 import Mathlib.Init.Control.Combinators
 import Mathlib.Init.Core
@@ -640,18 +645,25 @@ import Mathlib.Init.Data.Bool.Lemmas
 import Mathlib.Init.Data.Fin.Basic
 import Mathlib.Init.Data.Int.Basic
 import Mathlib.Init.Data.Int.Bitwise
+import Mathlib.Init.Data.Int.DivMod
+import Mathlib.Init.Data.Int.Lemmas
 import Mathlib.Init.Data.Int.Order
 import Mathlib.Init.Data.List.Basic
 import Mathlib.Init.Data.List.Instances
 import Mathlib.Init.Data.List.Lemmas
 import Mathlib.Init.Data.Nat.Basic
 import Mathlib.Init.Data.Nat.Bitwise
+import Mathlib.Init.Data.Nat.Div
 import Mathlib.Init.Data.Nat.GCD
 import Mathlib.Init.Data.Nat.Lemmas
 import Mathlib.Init.Data.Nat.Notation
+import Mathlib.Init.Data.Option.Basic
+import Mathlib.Init.Data.Option.Init.Lemmas
+import Mathlib.Init.Data.Option.Lemmas
 import Mathlib.Init.Data.Ordering.Basic
 import Mathlib.Init.Data.Prod
 import Mathlib.Init.Data.Quot
+import Mathlib.Init.Data.Rat.Basic
 import Mathlib.Init.Data.Sigma.Basic
 import Mathlib.Init.Data.Subtype.Basic
 import Mathlib.Init.Function
@@ -912,7 +924,9 @@ import Mathlib.Topology.Bornology.Basic
 import Mathlib.Topology.Bornology.Constructions
 import Mathlib.Topology.Bornology.Hom
 import Mathlib.Topology.LocallyFinite
+import Mathlib.Topology.Maps
 import Mathlib.Topology.NhdsSet
+import Mathlib.Topology.Order
 import Mathlib.Util.AtomM
 import Mathlib.Util.Export
 import Mathlib.Util.IncludeStr

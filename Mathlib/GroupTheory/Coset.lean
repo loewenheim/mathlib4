@@ -605,8 +605,9 @@ def rightCosetEquivSubgroup (g : α) : rightCoset (↑s) g ≃ s :=
 #align add_subgroup.right_coset_equiv_add_subgroup AddSubgroup.rightCosetEquivAddSubgroup
 
 /-- A (non-canonical) bijection between a group `α` and the product `(α/s) × s` -/
-@[to_additive "A (non-canonical) bijection between an add_group `α` and the product `(α/s) × s`"]
-noncomputable def groupEquivQuotientTimesSubgroup : α ≃ (α ⧸ s) × s :=
+@[to_additive addGroupEquivQuotientProdAddSubgroup
+  "A (non-canonical) bijection between an add_group `α` and the product `(α/s) × s`"]
+noncomputable def groupEquivQuotientProdSubgroup : α ≃ (α ⧸ s) × s :=
   calc
     α ≃ ΣL : α ⧸ s, { x : α // (x : α ⧸ s) = L } := (Equiv.sigmaFiberEquiv QuotientGroup.mk).symm
     _ ≃ ΣL : α ⧸ s, leftCoset (Quotient.out' L) s :=
@@ -620,9 +621,8 @@ noncomputable def groupEquivQuotientTimesSubgroup : α ≃ (α ⧸ s) × s :=
     _ ≃ Σ _L : α ⧸ s, s := Equiv.sigmaCongrRight fun L => leftCosetEquivSubgroup _
     _ ≃ (α ⧸ s) × s := Equiv.sigmaEquivProd _ _
 
-#align subgroup.group_equiv_quotient_times_subgroup Subgroup.groupEquivQuotientTimesSubgroup
-#align add_subgroup.add_group_equiv_quotient_times_add_subgroup
-  AddSubgroup.addGroupEquivQuotientTimesAddSubgroup
+#align subgroup.group_equiv_quotient_times_subgroup Subgroup.groupEquivQuotientProdSubgroup
+#align add_subgroup.add_group_equiv_quotient_times_add_subgroup AddSubgroup.addGroupEquivQuotientProdAddSubgroup
 
 variable {t : Subgroup α}
 
@@ -802,11 +802,9 @@ theorem quotientInfᵢEmbedding_apply_mk {ι : Type _} (f : ι → Subgroup α) 
 @[to_additive]
 theorem card_eq_card_quotient_mul_card_subgroup [Fintype α] (s : Subgroup α) [Fintype s]
     [DecidablePred fun a => a ∈ s] : Fintype.card α = Fintype.card (α ⧸ s) * Fintype.card s := by
-  rw [← Fintype.card_prod]; exact Fintype.card_congr Subgroup.groupEquivQuotientTimesSubgroup
-#align subgroup.card_eq_card_quotient_mul_card_subgroup
-  Subgroup.card_eq_card_quotient_mul_card_subgroup
-#align add_subgroup.card_eq_card_quotient_add_card_add_subgroup
-  AddSubgroup.card_eq_card_quotient_add_card_addSubgroup
+  rw [← Fintype.card_prod]; exact Fintype.card_congr Subgroup.groupEquivQuotientProdSubgroup
+#align subgroup.card_eq_card_quotient_mul_card_subgroup Subgroup.card_eq_card_quotient_mul_card_subgroup
+#align add_subgroup.card_eq_card_quotient_add_card_add_subgroup AddSubgroup.card_eq_card_quotient_add_card_addSubgroup
 
 /-- **Lagrange's Theorem**: The order of a subgroup divides the order of its ambient group. -/
 @[to_additive "**Lagrange's Theorem**: The order of an additive subgroup divides the order of its
@@ -865,10 +863,11 @@ variable [Group α]
 
 /-- If `s` is a subgroup of the group `α`, and `t` is a subset of `α ⧸ s`, then there is a
 (typically non-canonical) bijection between the preimage of `t` in `α` and the product `s × t`. -/
-@[to_additive "If `s` is a subgroup of the additive group `α`, and `t` is a subset of `α ⧸ s`, then
+@[to_additive preimageMkEquivAddSubgroupProdSet
+"If `s` is a subgroup of the additive group `α`, and `t` is a subset of `α ⧸ s`, then
  there is a (typically non-canonical) bijection between the preimage of `t` in `α` and the product
  `s × t`."]
-noncomputable def preimageMkEquivSubgroupTimesSet (s : Subgroup α) (t : Set (α ⧸ s)) :
+noncomputable def preimageMkEquivSubgroupProdSet (s : Subgroup α) (t : Set (α ⧸ s)) :
     QuotientGroup.mk ⁻¹' t ≃ s × t
     where
   toFun a :=
@@ -882,10 +881,7 @@ noncomputable def preimageMkEquivSubgroupTimesSet (s : Subgroup α) (t : Set (α
         exact a.2.2⟩
   left_inv := fun ⟨a, ha⟩ => Subtype.eq <| show _ * _ = a by simp
   right_inv := fun ⟨⟨a, ha⟩, ⟨x, hx⟩⟩ => by ext <;> simp [ha]
-#align quotient_group.preimage_mk_equiv_subgroup_times_set
-  QuotientGroup.preimageMkEquivSubgroupTimesSet
-#align quotient_add_group.preimage_mk_equiv_add_subgroup_times_set
-  QuotientAddGroup.preimageMkEquivAddSubgroupTimesSet
+#align quotient_group.preimage_mk_equiv_subgroup_times_set QuotientGroup.preimageMkEquivSubgroupProdSet
+#align quotient_add_group.preimage_mk_equiv_add_subgroup_times_set QuotientAddGroup.preimageMkEquivAddSubgroupProdSet
 
 end QuotientGroup
-
