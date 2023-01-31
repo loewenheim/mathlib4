@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Johannes Hölzl, Mario Carneiro, Patrick Massot
 
 ! This file was ported from Lean 3 source module topology.constructions
-! leanprover-community/mathlib commit f7fc89d5d5ff1db2d1242c7bb0e9062ce47ef47c
+! leanprover-community/mathlib commit bcfa726826abd57587355b4b5b7e78ad6527b7e4
 ! Please do not edit these lines, except to modify the commit id
 ! if you have ported upstream changes.
 -/
@@ -189,13 +189,13 @@ theorem Quotient.preimage_mem_nhds [TopologicalSpace α] [s : Setoid α] {V : Se
   preimage_nhds_coinduced hs
 #align quotient.preimage_mem_nhds Quotient.preimage_mem_nhds
 
-/-- The image of a dense set under `quotient.mk` is a dense set. -/
+/-- The image of a dense set under `Quotient.mk'` is a dense set. -/
 theorem Dense.quotient [Setoid α] [TopologicalSpace α] {s : Set α} (H : Dense s) :
     Dense (Quotient.mk' '' s) :=
   Quotient.surjective_Quotient_mk''.denseRange.dense_image continuous_coinduced_rng H
 #align dense.quotient Dense.quotient
 
-/-- The composition of `quotient.mk` and a function with dense range has dense range. -/
+/-- The composition of `Quotient.mk'` and a function with dense range has dense range. -/
 theorem DenseRange.quotient [Setoid α] [TopologicalSpace α] {f : β → α} (hf : DenseRange f) :
     DenseRange (Quotient.mk' ∘ f) :=
   Quotient.surjective_Quotient_mk''.denseRange.comp hf continuous_coinduced_rng
@@ -261,7 +261,7 @@ def CofiniteTopology (α : Type _) :=
 
 namespace CofiniteTopology
 
-/-- The identity equivalence between `α` and `cofinite_topology α`. -/
+/-- The identity equivalence between `α` and `CofiniteTopology α`. -/
 def of : α ≃ CofiniteTopology α :=
   Equiv.refl α
 #align cofinite_topology.of CofiniteTopology.of
@@ -564,7 +564,7 @@ theorem Prod.tendsto_iff {α} (seq : α → β × γ) {f : Filter α} (x : β ×
 #align prod.tendsto_iff Prod.tendsto_iff
 
 instance [DiscreteTopology α] [DiscreteTopology β] : DiscreteTopology (α × β) :=
-  discreteTopology_iff_nhds.2 <| fun (a, b) => by
+  discreteTopology_iff_nhds.2 fun (a, b) => by
     rw [nhds_prod_eq, nhds_discrete α, nhds_discrete β, prod_pure_pure]
 
 theorem prod_mem_nhds_iff {s : Set α} {t : Set β} {a : α} {b : β} :
@@ -802,7 +802,7 @@ theorem DenseRange.prod_map {ι : Type _} {κ : Type _} {f : ι → β} {g : κ 
 
 theorem Inducing.prod_map {f : α → β} {g : γ → δ} (hf : Inducing f) (hg : Inducing g) :
     Inducing (Prod.map f g) :=
-  inducing_iff_nhds.2 <| fun (a, b) => by simp_rw [Prod.map, nhds_prod_eq, hf.nhds_eq_comap,
+  inducing_iff_nhds.2 fun (a, b) => by simp_rw [Prod.map, nhds_prod_eq, hf.nhds_eq_comap,
     hg.nhds_eq_comap, prod_comap_comap_eq]
 #align inducing.prod_mk Inducing.prod_map
 
@@ -1126,6 +1126,17 @@ theorem Embedding.codRestrict {e : α → β} (he : Embedding e) (s : Set β) (h
   embedding_of_embedding_compose (he.continuous.codRestrict hs) continuous_subtype_val he
 #align embedding.cod_restrict Embedding.codRestrict
 
+theorem embedding_inclusion {s t : Set α} (h : s ⊆ t) : Embedding (Set.inclusion h) :=
+  embedding_subtype_val.codRestrict _ _
+#align embedding_inclusion embedding_inclusion
+
+/-- Let `s, t ⊆ X` be two subsets of a topological space `X`.  If `t ⊆ s` and the topology induced
+by `X`on `s` is discrete, then also the topology induces on `t` is discrete.  -/
+theorem DiscreteTopology.of_subset {X : Type _} [TopologicalSpace X] {s t : Set X}
+    (_ : DiscreteTopology s) (ts : t ⊆ s) : DiscreteTopology t :=
+  (embedding_inclusion ts).discreteTopology
+#align discrete_topology.of_subset DiscreteTopology.of_subset
+
 end Subtype
 
 section Quotient
@@ -1193,12 +1204,6 @@ theorem continuous_pi (h : ∀ i, Continuous fun a => f a i) : Continuous f :=
 theorem continuous_apply (i : ι) : Continuous fun p : ∀ i, π i => p i :=
   continuous_infᵢ_dom continuous_induced_dom
 #align continuous_apply continuous_apply
-
--- porting note: new lemma
-theorem isOpen_pi_set {s : Set ι} {t : (i : ι) → Set (π i)}
-    (hs : s.Finite) (h : ∀ i ∈ s, IsOpen (t i)) : IsOpen (s.pi t) := by
-  rw [pi_def]
-  exact isOpen_binterᵢ hs fun a ha => (h a ha).preimage (continuous_apply a)
 
 -- porting note: todo: restore @[continuity]
 theorem continuous_apply_apply {ρ : κ → ι → Type _} [∀ j i, TopologicalSpace (ρ j i)] (j : κ)
@@ -1341,7 +1346,7 @@ theorem pi_generateFrom_eq_finite {π : ι → Type _} {g : ∀ a, Set (Set (π 
       generateFrom { t | ∃ s : ∀ a, Set (π a), (∀ a, s a ∈ g a) ∧ t = pi univ s } := by
   cases nonempty_fintype ι
   rw [pi_generateFrom_eq]
-  refine' le_antisymm (generateFrom_mono _) (le_generateFrom _)
+  refine' le_antisymm (generateFrom_anti _) (le_generateFrom _)
   · exact fun s ⟨t, ht, Eq⟩ => ⟨t, Finset.univ, by simp [ht, Eq]⟩
   · rintro s ⟨t, i, ht, rfl⟩
     letI := generateFrom { t | ∃ s : ∀ a, Set (π a), (∀ a, s a ∈ g a) ∧ t = pi univ s }
@@ -1374,7 +1379,7 @@ variable [Finite ι] [∀ i, DiscreteTopology (π i)]
 instance PiCat.discreteTopology : DiscreteTopology (∀ i, π i) :=
   singletons_open_iff_discrete.mp fun x => by
     rw [← univ_pi_singleton]
-    exact isOpen_pi_set finite_univ fun i _ => (isOpen_discrete {x i})
+    exact isOpen_set_pi finite_univ fun i _ => (isOpen_discrete {x i})
 #align Pi.discrete_topology PiCat.discreteTopology
 
 end Pi
@@ -1529,5 +1534,12 @@ theorem continuous_uLift_down [TopologicalSpace α] : Continuous (ULift.down : U
 theorem continuous_uLift_up [TopologicalSpace α] : Continuous (ULift.up : α → ULift.{v, u} α) :=
   continuous_induced_rng.2 continuous_id
 #align continuous_ulift_up continuous_uLift_up
+
+theorem embedding_uLift_down [TopologicalSpace α] : Embedding (ULift.down : ULift.{v, u} α → α) :=
+  ⟨⟨rfl⟩, ULift.down_injective⟩
+#align embedding_ulift_down embedding_uLift_down
+
+instance [TopologicalSpace α] [DiscreteTopology α] : DiscreteTopology (ULift α) :=
+  embedding_uLift_down.discreteTopology
 
 end ULift
